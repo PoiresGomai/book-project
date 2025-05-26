@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>图书管理系统</title>
+    <link rel="stylesheet" href="../../static/css/public.css"/>
+    <link rel="stylesheet" href="../../static/css/style.css"/>
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader">
+    <h1>图书管理系统</h1>
+    <div class="publicHeaderR">
+        <p><span>下午好！</span><span style="color: #fff21b"> {{ name }}</span>管理员 , 欢迎你！</p>
+        <a href="/manager/logout/">退出</a>
+    </div>
+</header>
+<!--时间-->
+<section class="publicTime">
+    <span id="time"></span>
+    <a href="#">温馨提示：为了能正常浏览，请使用google浏览器！</a>
+</section>
+<!--主体内容-->
+<section class="publicMian ">
+    <div class="left">
+        <h2 class="leftH2"><span class="span1"></span>功能列表 <span></span></h2>
+        <nav>
+            <ul class="list">
+                <li><a href="/manager/add_publisher/">添加出版社页面</a></li>
+                <li><a href="/manager/add_book/">添加图书页面</a></li>
+                <li><a href="/manager/add_author/">添加作者页面</a></li>
+                <li><a href="/manager/logout/">退出系统</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>出版社列表页面</span>
+        </div>
+        <div style="overflow: scroll;height: 560px;width: 1255px;">
+            <table class="providerTable" cellpadding="0" cellspacing="0"
+                   style="position: relative;top: 8px;width: 1237px;left: 0px;">
+                <tr class="firstTr">
+                    <th>序号</th>
+                    <th>出版社ID</th>
+                    <th>出版社姓名</th>
+                    <th>出版社地址</th>
+                    <th>操作</th>
+                </tr>
+                {% for publisher_obj in publisher_obj_list  %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ publisher_obj.id }}</td>
+                    <td>{{ publisher_obj.publisher_name }}</td>
+                    <td>{{ publisher_obj.publisher_address }}</td>
+                    <td>
+                        <a href="/manager/edit_publisher/?id={{ publisher_obj.id }}"><img src="../../static/img/xiugai.png" alt="修改" title="修改"/></a>
+                        <a href="/manager/delete_publisher/?id={{ publisher_obj.id }}"><img src="../../static/img/schu.png" alt="删除" title="删除"/></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</section>
+<!--点击删除按钮后弹出的页面-->
+<footer class="footer">
+</footer>
+<script src="../../static/js/jquery.js"></script>
+<script src="../../static/js/js.js"></script>
+<script src="../../static/js/time.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Django Book Management System Requirements
+
+# Core Framework
+Django>=4.1.0,<5.0.0
+
+# Database Driver (choose one)
+mysqlclient>=2.1.0
+# Alternative: PyMySQL>=1.0.2 (if mysqlclient installation fails)
+
+# Optional but recommended for development
+python-decouple>=3.6  # For environment variables
+pillow>=9.0.0  # If you plan to add image handling later

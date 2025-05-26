@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>图书管理系统</title>
+    <link rel="stylesheet" href="../../static/css/public.css"/>
+    <link rel="stylesheet" href="../../static/css/style.css"/>
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader">
+    <h1>图书管理系统</h1>
+    <div class="publicHeaderR">
+        <p><span>下午好！</span><span style="color: #fff21b"> {{ name }}</span>管理员 , 欢迎你！</p>
+        <a href="/manager/logout/">退出</a>
+    </div>
+</header>
+<!--时间-->
+
+<section class="publicTime">
+    <span id="time"></span>
+    <a href="#">温馨提示：为了能正常浏览，请使用google浏览器！</a>
+</section>
+<!--主体内容-->
+<section class="publicMian ">
+    <div class="left">
+        <h2 class="leftH2"><span class="span1"></span>功能列表 <span></span></h2>
+        <nav>
+            <ul class="list">
+                <li><a href="/manager/publisher_list/">出版社列表页面</a></li>
+                <li><a href="/manager/book_list/">图书列表页面</a></li>
+                <li><a href="/manager/author_list/">作者列表页面</a></li>
+                <li><a href="/manager/logout/">退出系统</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>修改图书页面</span>
+        </div>
+        <div class="providerAdd">
+            <form action="/manager/edit_book/" method="post" style="text-align: center;">
+                {% csrf_token %}
+                <div>
+                   <input type="hidden" name="id" value="{{ book_obj.id }}" >
+                </div>
+                <div>
+                    <label>图书名称：</label>
+                    <input type="text" name="name" value="{{ book_obj.name }}" required/>
+                </div>
+                <div>
+                    <label>价格：</label>
+                    <input type="text" name="price" value="{{ book_obj.price }}" required/>
+                </div>
+                <div>
+                    <label>库存：</label>
+                    <input type="text" name="inventory" value="{{ book_obj.inventory }}" required/>
+                </div>
+                <div>
+                    <label>卖出数：</label>
+                    <input type="text" name="sale_num" value="{{ book_obj.sale_num }}" required/>
+                </div>
+                <div>
+                    <label>出版社：</label>
+                    <select name="publisher_id" id="id" required>
+                        {% for publisher_obj in publisher_obj_list %}
+                        <option value="{{ publisher_obj.id }}">{{ publisher_obj.publisher_name }}</option>
+                        {% endfor  %}
+                    </select>
+                </div>
+                <div class="providerAddBtn">
+                    <input type="submit" value="确&nbsp;认" style=" width: 88px;height: 42px;position: absolute;left: 745px;top: 383px;font-size: 20px;">
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="../../static/js/jquery.js"></script>
+    <script src="../../static/js/js.js"></script>
+    <script src="../../static/js/time.js"></script>
+</section>
+</body>
+</html>
+
+
