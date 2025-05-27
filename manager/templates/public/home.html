@@ -15,10 +15,10 @@
                     探索丰富的图书资源，发现知识的海洋。我们为您提供最全面的图书信息查询和浏览服务。
                 </p>
                 <div class="d-flex gap-3 flex-wrap">
-                    <a href="/public/books/" class="btn btn-primary-modern btn-modern">
+                    <a href="{% url 'public_books' %}" class="btn btn-primary-modern btn-modern">
                         <i class="fas fa-search"></i> 浏览图书
                     </a>
-                    <a href="/public/authors/" class="btn btn-outline-light btn-modern">
+                    <a href="{% url 'public_authors' %}" class="btn btn-outline-light btn-modern">
                         <i class="fas fa-users"></i> 查看作者
                     </a>
                 </div>
@@ -76,7 +76,7 @@
                     <h2 class="fw-bold mb-3">快速搜索图书</h2>
                     <p class="text-muted">输入书名关键词，快速找到您感兴趣的图书</p>
                 </div>
-                <form action="/public/books/" method="get" class="d-flex gap-3">
+                <form action="{% url 'public_books' %}" method="get" class="d-flex gap-3">
                     <input type="search" name="search" class="form-control search-box flex-grow-1" 
                            placeholder="输入书名进行搜索..." value="{{ request.GET.search }}">
                     <button type="submit" class="btn btn-primary-modern btn-modern">
@@ -114,7 +114,7 @@
                                 <small class="text-muted">
                                     <i class="fas fa-fire"></i> 销量: {{ book.sale_num }}
                                 </small>
-                                <a href="/public/books/{{ book.id }}/" class="btn btn-outline-primary btn-sm">
+                                <a href="{% url 'public_book_detail' book.id %}" class="btn btn-outline-primary btn-sm">
                                     查看详情 <i class="fas fa-arrow-right"></i>
                                 </a>
                             </div>
@@ -125,7 +125,7 @@
             {% endfor %}
         </div>
         <div class="text-center mt-4" data-aos="fade-up">
-            <a href="/public/books/" class="btn btn-primary-modern btn-modern">
+            <a href="{% url 'public_books' %}" class="btn btn-primary-modern btn-modern">
                 查看所有图书 <i class="fas fa-arrow-right"></i>
             </a>
         </div>
@@ -173,7 +173,7 @@
                 <p class="mb-0">立即浏览我们丰富的图书收藏，发现您感兴趣的内容。</p>
             </div>
             <div class="col-lg-4 text-lg-end" data-aos="fade-left">
-                <a href="/public/books/" class="btn btn-light btn-modern">
+                <a href="{% url 'public_books' %}" class="btn btn-light btn-modern">
                     <i class="fas fa-rocket"></i> 开始浏览
                 </a>
             </div>

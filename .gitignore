@@ -77,9 +77,11 @@ logs/
 # Secret files
 secrets.py
 
-# Documentation (exclude all .md and .txt except README)
+# Documentation (allow deployment files)
 *.md
 *.txt
 !README.md
 !README.txt
+!requirements.txt
+!.env.example
 

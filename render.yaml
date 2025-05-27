@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: book-management-system
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn book_Project.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: PYTHONUNBUFFERED
+        value: true
+
+databases:
+  - name: book-management-db
+    databaseName: book_management
+    user: book_user
+    region: singapore
+    plan: free

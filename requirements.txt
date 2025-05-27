@@ -1,0 +1,32 @@
+# Django Book Management System Requirements
+# For use with Conda environments
+
+# Core Framework (install via conda: conda install django=4.1)
+Django>=4.2,<5.0
+
+# Database Driver (install via conda: conda install mysqlclient)
+# mysqlclient>=2.1.0
+# Alternative: PyMySQL>=1.0.2 (install via pip if mysqlclient fails)
+PyMySQL>=1.0.2
+
+# Development packages
+python-decouple>=3.6  # For environment variables
+
+# Optional packages (install via conda: conda install pillow)
+Pillow>=9.0.0  # For image handling
+
+# Gunicorn for serving the application
+gunicorn>=20.1.0
+
+# Whitenoise for serving static files
+whitenoise>=6.0.0
+
+# PostgreSQL adapter
+psycopg2-binary>=2.9.0
+
+# Database URL helper
+dj-database-url>=2.0.0
+
+# Note: For conda users, prefer installing packages via conda:
+# conda install django mysqlclient pillow
+# pip install python-decouple PyMySQL
