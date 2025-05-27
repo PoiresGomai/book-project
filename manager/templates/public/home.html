@@ -117,6 +117,11 @@
                                 <a href="{% url 'public_book_detail' book.id %}" class="btn btn-outline-primary btn-sm">
                                     查看详情 <i class="fas fa-arrow-right"></i>
                                 </a>
+                                {% if book.inventory > 0 %}
+                                    <button onclick="addToCartQuick({{ book.id }})" class="btn btn-primary btn-sm ms-2">
+                                        <i class="fas fa-shopping-cart"></i> 加入购物车
+                                    </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -181,3 +186,55 @@
     </div>
 </section>
 {% endblock %}
+
+<script>
+// Quick add to cart function for book listing
+function addToCartQuick(bookId) {
+    // Add CSRF token if not present
+    if (!document.querySelector('[name=csrfmiddlewaretoken]')) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        document.body.appendChild(csrfInput);
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch(`/manager/cart/add/${bookId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrfToken
+        },
+        body: 'quantity=1'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showQuickMessage(data.message, 'success');
+        } else {
+            showQuickMessage(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        showQuickMessage('添加失败，请重试', 'error');
+    });
+}
+
+function showQuickMessage(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 3000);
+}
+</script>

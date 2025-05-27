@@ -36,4 +36,15 @@ urlpatterns = [
     path('public/authors/<int:author_id>/', views.public_author_detail, name='public_author_detail'),
     path('public/publishers/', views.public_publishers, name='public_publishers'),
     path('public/publishers/<int:publisher_id>/', views.public_publisher_detail, name='public_publisher_detail'),
+
+    # =========================E-commerce URLs========================
+    path('cart/add/<int:book_id>/', views.add_to_cart, name='add_to_cart'),
+    path('cart/', views.view_cart, name='view_cart'),
+    path('cart/update/', views.update_cart, name='update_cart'),
+    path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('cart/count/', views.get_cart_count, name='get_cart_count'),
+    path('buy-now/<int:book_id>/', views.buy_now, name='buy_now'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('order-confirmation/<str:order_number>/', views.order_confirmation, name='order_confirmation'),
+    path('track-order/', views.track_order, name='track_order'),
 ]

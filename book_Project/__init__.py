@@ -1,11 +1,9 @@
 """
 Django Book Management System
 Project initialization file
+PostgreSQL Version
 """
 
-# Using PyMySQL instead of mysqlclient for better Windows compatibility
-import pymysql
-
-# Use PyMySQL as MySQL driver
-pymysql.install_as_MySQLdb()
+# PostgreSQL uses psycopg2 which doesn't need special initialization
+# No additional imports needed for PostgreSQL
 

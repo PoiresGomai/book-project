@@ -209,6 +209,50 @@
             color: #2c3e50;
             font-weight: 500;
         }
+        
+        .book-cover {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .book-cover-img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .book-cover-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .book-description {
+            color: #555;
+            font-style: italic;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+        
+        .book-description i {
+            color: #667eea;
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .book-cover {
+                text-align: center;
+            }
+            
+            .book-cover-img {
+                height: 150px;
+                width: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -230,112 +274,190 @@
         </a>
 
         <div class="row">
-            <div class="col-md-8">
-                <div class="content-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-books"></i>出版图书
-                    </h3>
-                    
-                    {% if books %}
-                        {% for book in books %}
-                        <div class="book-card">
-                            <div class="book-title">{{ book.name }}</div>
-                            <div class="book-meta">
-                                <i class="fas fa-users"></i>作者: 
-                                {% if book.author_set.all %}
-                                    {% for author in book.author_set.all %}
-                                        {{ author.name }}{% if not forloop.last %}, {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    未知作者
-                                {% endif %}
-                            </div>
-                            <div class="book-meta">
-                                <i class="fas fa-boxes"></i>库存: {{ book.inventory }} 本
-                            </div>
-                            <div class="book-meta">
-                                <i class="fas fa-chart-line"></i>销量: {{ book.sale_num }} 本
-                            </div>
-                            <div class="authors-list">
-                                {% for author in book.author_set.all %}
-                                <span class="author-tag">
-                                    <i class="fas fa-user"></i> {{ author.name }}
-                                </span>
-                                {% endfor %}
-                            </div>
-                            <span class="price-tag">
-                                <i class="fas fa-tag"></i> ¥{{ book.price }}
-                            </span>
+            <div class="col-md-4 mb-4" data-aos="fade-right">
+                <div class="card card-modern text-center p-5">
+                    <i class="fas fa-building text-primary" style="font-size: 8rem; opacity: 0.8;"></i>
+                    <h4 class="mt-3 fw-bold">{{ publisher.publisher_name }}</h4>
+                    <p class="text-muted">
+                        <i class="fas fa-map-marker-alt"></i> {{ publisher.publisher_address }}
+                    </p>
+                    <div class="mt-4">
+                        <div class="stats-card mb-3">
+                            <span class="stats-number">{{ books.count }}</span>
+                            <span class="stats-label">出版图书</span>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="no-books">
-                            <i class="fas fa-book-open"></i>
-                            <h5>暂无出版图书</h5>
-                            <p>该出版社目前还没有出版任何图书。</p>
-                        </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
             
-            <div class="col-md-4">
-                <div class="address-card">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div class="address-text">{{ publisher.publisher_address }}</div>
-                </div>
-                
-                <div class="stats-card">
-                    <span class="stats-number">{{ books.count }}</span>
-                    <span class="stats-label">出版图书数量</span>
-                </div>
-                
-                {% if books %}
-                <div class="stats-card">
-                    <span class="stats-number">{{ total_sales }}</span>
-                    <span class="stats-label">总销量</span>
-                </div>
-                
-                <div class="stats-card">
-                    <span class="stats-number">{{ total_inventory }}</span>
-                    <span class="stats-label">总库存</span>
-                </div>
-                
-                <div class="stats-card">
-                    <span class="stats-number">¥{{ avg_price|floatformat:2 }}</span>
-                    <span class="stats-label">平均价格</span>
-                </div>
-                
-                <div class="stats-card">
-                    <span class="stats-number">{{ author_count }}</span>
-                    <span class="stats-label">合作作者数</span>
-                </div>
-                {% endif %}
-                
-                <div class="content-section">
-                    <h5 class="section-title">
-                        <i class="fas fa-info-circle"></i>出版社信息
-                    </h5>
-                    <div class="book-meta">
-                        <i class="fas fa-id-badge"></i>出版社ID: {{ publisher.id }}
-                    </div>
-                    <div class="book-meta">
-                        <i class="fas fa-building"></i>出版社名称: {{ publisher.publisher_name }}
-                    </div>
-                    <div class="book-meta">
-                        <i class="fas fa-map-marker-alt"></i>详细地址: {{ publisher.publisher_address }}
-                    </div>
-                    <div class="book-meta">
-                        <i class="fas fa-calendar"></i>注册时间: 
-                        {% if publisher.created_at %}
-                            {{ publisher.created_at|date:"Y年m月d日" }}
-                        {% else %}
-                            未知
+            <div class="col-md-8" data-aos="fade-left">
+                <div class="card card-modern h-100">
+                    <div class="card-body">
+                        <h2 class="fw-bold mb-4">{{ publisher.publisher_name }}</h2>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2">基本信息</h6>
+                                <p class="mb-1">
+                                    <i class="fas fa-id-badge text-primary"></i> 
+                                    <strong>出版社ID:</strong> {{ publisher.id }}
+                                </p>
+                                <p class="mb-1">
+                                    <i class="fas fa-building text-primary"></i> 
+                                    <strong>名称:</strong> {{ publisher.publisher_name }}
+                                </p>
+                                <p class="text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> 
+                                    <strong>地址:</strong> {{ publisher.publisher_address }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2">出版统计</h6>
+                                <div class="d-flex gap-3">
+                                    <div class="text-center p-3 bg-light rounded flex-fill">
+                                        <div class="fw-bold text-primary h4">{{ books.count }}</div>
+                                        <small class="text-muted">出版图书</small>
+                                    </div>
+                                    <div class="text-center p-3 bg-light rounded flex-fill">
+                                        <div class="fw-bold text-success h4">{{ total_sales }}</div>
+                                        <small class="text-muted">总销量</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Publishers Stats -->
+                        {% if books %}
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-3">出版概况</h6>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="fw-bold text-info h5">{{ total_inventory }}</div>
+                                        <small class="text-muted">总库存</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="fw-bold text-warning h5">¥{{ avg_price|floatformat:2 }}</div>
+                                        <small class="text-muted">平均价格</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="fw-bold text-success h5>{{ author_count }}</div>
+                                        <small class="text-muted">合作作者</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <div class="fw-bold text-danger h5">¥{{ total_revenue|floatformat:2 }}</div>
+                                        <small class="text-muted">总收入</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         {% endif %}
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 flex-wrap">
+                            <a href="{% url 'public_publishers' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> 返回出版社列表
+                            </a>
+                            <a href="{% url 'public_books' %}?publisher={{ publisher.id }}" class="btn btn-outline-primary">
+                                <i class="fas fa-book"></i> 查看该出版社图书
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Published Books -->
+    {% if books %}
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h3 class="fw-bold mb-4" data-aos="fade-up">出版图书</h3>
+            <div class="row">
+                {% for book in books %}
+                <div class="col-lg-4 col-md-6 mb-4" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:100 }}">
+                    <div class="card card-modern h-100">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="book-cover">
+                                        <img src="{{ book.get_cover_url }}" alt="{{ book.name }}" class="img-fluid book-cover-img">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="book-title">{{ book.name }}</div>
+                                    {% if book.description %}
+                                    <div class="book-description">
+                                        <i class="fas fa-quote-left"></i>
+                                        {{ book.get_medium_description }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="book-meta">
+                                        <i class="fas fa-users"></i>作者: 
+                                        {% if book.author_set.all %}
+                                            {% for author in book.author_set.all %}
+                                                {{ author.name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            未知作者
+                                        {% endif %}
+                                    </div>
+                                    <div class="book-meta">
+                                        <i class="fas fa-boxes"></i>库存: {{ book.inventory }} 本
+                                    </div>
+                                    <div class="book-meta">
+                                        <i class="fas fa-chart-line"></i>销量: {{ book.sale_num }} 本
+                                    </div>
+                                    <div class="authors-list">
+                                        {% for author in book.author_set.all %}
+                                        <span class="author-tag">
+                                            <i class="fas fa-user"></i> {{ author.name }}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="price-tag">
+                                        <i class="fas fa-tag"></i> ¥{{ book.price }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if books.count > 6 %}
+            <div class="text-center mt-4">
+                <a href="{% url 'public_books' %}?publisher={{ publisher.id }}" class="btn btn-primary-modern">
+                    查看更多图书 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% else %}
+    <!-- No Books Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center py-5" data-aos="zoom-in">
+                <div class="mb-4">
+                    <i class="fas fa-book text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
+                </div>
+                <h4 class="text-muted mb-3">暂无出版图书</h4>
+                <p class="text-muted mb-4">该出版社目前还没有出版任何图书</p>
+                <a href="{% url 'public_books' %}" class="btn btn-primary-modern">
+                    <i class="fas fa-book"></i> 浏览其他图书
+                </a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

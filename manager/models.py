@@ -1,4 +1,8 @@
 from django.db import models
+from django.utils import timezone
+from decimal import Decimal
+import os
+import uuid
 
 
 # 创建数据库对象模型
@@ -32,6 +36,16 @@ class Book(models.Model):
     id = models.AutoField(primary_key=True)
     # 图书名称
     name = models.CharField(max_length=32)
+    # 图书描述
+    description = models.TextField(verbose_name='图书描述', blank=True, null=True, help_text='图书详细描述信息')
+    # 图书封面
+    cover_image = models.ImageField(
+        upload_to='book_covers/', 
+        verbose_name='图书封面', 
+        blank=True, 
+        null=True,
+        help_text='上传图书封面图片'
+    )
     # 图书价格 最多5位，小数保留2位
     price = models.DecimalField(max_digits=5, decimal_places=2)
     # 库存
@@ -43,6 +57,32 @@ class Book(models.Model):
 
     class Meta:
         db_table = "book"
+    
+    def get_cover_url(self):
+        """获取封面图片URL，如果没有封面则返回默认图片"""
+        if self.cover_image and hasattr(self.cover_image, 'url'):
+            return self.cover_image.url
+        return '/static/images/default_book_cover.jpg'
+    
+    def get_short_description(self, max_length=100):
+        """获取简短描述"""
+        if self.description:
+            if len(self.description) > max_length:
+                return self.description[:max_length] + '...'
+            return self.description
+        return '暂无描述'
+    
+    def get_medium_description(self):
+        """获取中等长度描述(150字符)"""
+        return self.get_short_description(150)
+    
+    def get_brief_description(self):
+        """获取简要描述(100字符)"""
+        return self.get_short_description(100)
+    
+    def get_long_description(self):
+        """获取较长描述(300字符)"""
+        return self.get_short_description(300)
 
 
 # 作者类
@@ -57,6 +97,132 @@ class Author(models.Model):
     # 指定数据表名称（未指定即为默认类名）
     class Meta:
         db_table = "author"
+
+
+# E-commerce Models for Shopping Cart and Orders
+
+PAYMENT_METHOD_CHOICES = [
+    ('credit_card', '信用卡'),
+    ('debit_card', '借记卡'),
+    ('paypal', 'PayPal'),
+    ('alipay', '支付宝'),
+    ('wechat_pay', '微信支付'),
+    ('bank_transfer', '银行转账'),
+    ('cash_on_delivery', '货到付款'),
+]
+
+ORDER_STATUS_CHOICES = [
+    ('pending', '待处理'),
+    ('confirmed', '已确认'),
+    ('processing', '处理中'),
+    ('shipped', '已发货'),
+    ('delivered', '已送达'),
+    ('cancelled', '已取消'),
+    ('refunded', '已退款'),
+]
+
+
+# 客户订单模型
+class Order(models.Model):
+    """Order model for customer purchases"""
+    order_number = models.CharField(max_length=32, unique=True, verbose_name="订单号")
+    customer_name = models.CharField(max_length=100, verbose_name="客户姓名")
+    customer_email = models.EmailField(verbose_name="客户邮箱")
+    customer_phone = models.CharField(max_length=20, verbose_name="客户电话")
+    
+    # 收货地址
+    shipping_address = models.TextField(verbose_name="收货地址")
+    shipping_city = models.CharField(max_length=50, verbose_name="城市")
+    shipping_state = models.CharField(max_length=50, blank=True, verbose_name="省份")
+    shipping_country = models.CharField(max_length=50, default='中国', verbose_name="国家")
+    shipping_postal_code = models.CharField(max_length=20, blank=True, verbose_name="邮政编码")
+    
+    # 订单详情
+    payment_method = models.CharField(
+        max_length=20, 
+        choices=PAYMENT_METHOD_CHOICES, 
+        verbose_name="支付方式"
+    )
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="总金额")
+    status = models.CharField(
+        max_length=20, 
+        choices=ORDER_STATUS_CHOICES, 
+        default='pending', 
+        verbose_name="订单状态"
+    )
+    customer_notes = models.TextField(blank=True, verbose_name="客户备注")
+    
+    # 时间戳
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+    
+    class Meta:
+        db_table = "order"
+        ordering = ['-created_at']
+        verbose_name = "订单"
+        verbose_name_plural = "订单"
+    
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            self.order_number = self.generate_order_number()
+        super().save(*args, **kwargs)
+    
+    def generate_order_number(self):
+        """Generate unique order number"""
+        import datetime
+        now = datetime.datetime.now()
+        return f"ORD{now.strftime('%Y%m%d%H%M%S')}{str(uuid.uuid4())[:8].upper()}"
+    
+    def get_total_items(self):
+        """Get total number of items in this order"""
+        return sum(item.quantity for item in self.orderitem_set.all())
+    
+    def __str__(self):
+        return f"订单 {self.order_number} - {self.customer_name}"
+
+# 订单项模型（一个订单包含多本图书）
+class OrderItem(models.Model):
+    """Individual items within an order"""
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name="订单")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, verbose_name="图书")
+    quantity = models.PositiveIntegerField(verbose_name="数量")
+    unit_price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="单价")
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="小计")
+    
+    class Meta:
+        db_table = "order_item"
+        verbose_name = "订单项目"
+        verbose_name_plural = "订单项目"
+    
+    def save(self, *args, **kwargs):
+        self.total_price = self.unit_price * self.quantity
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.order.order_number} - {self.book.name} x {self.quantity}"
+
+
+# 购物车模型（用于多本图书选择）
+class CartItem(models.Model):
+    """Shopping cart item model"""
+    session_key = models.CharField(max_length=40, verbose_name="会话密钥")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, verbose_name="图书")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="数量")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="添加时间")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+    
+    class Meta:
+        db_table = "cart_item"
+        unique_together = ('session_key', 'book')
+        verbose_name = "购物车项目"
+        verbose_name_plural = "购物车项目"
+    
+    def get_total_price(self):
+        """Calculate total price for this cart item"""
+        return self.book.price * self.quantity
+    
+    def __str__(self):
+        return f"{self.book.name} x {self.quantity}"
 
 # 创建(同步)数据表命令
 # 创建数据库db_book

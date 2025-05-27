@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Django Book Management System - Requirements Checker
+Django Book Management System - Requirements Checker (PostgreSQL Version)
 Run this script to verify all dependencies are properly installed
 """
 
@@ -29,8 +29,8 @@ def check_package(package_name, import_name=None):
         print(f"❌ {package_name} - Not installed")
         return False
 
-def check_mysql_connection():
-    """Check MySQL database connection"""
+def check_postgresql_connection():
+    """Check PostgreSQL database connection"""
     try:
         import django
         import os
@@ -42,14 +42,14 @@ def check_mysql_connection():
         from django.db import connection
         cursor = connection.cursor()
         cursor.execute("SELECT 1")
-        print("✅ MySQL Database Connection")
+        print("✅ PostgreSQL Database Connection")
         return True
     except Exception as e:
-        print(f"❌ MySQL Database Connection - {str(e)}")
+        print(f"❌ PostgreSQL Database Connection - {str(e)}")
         return False
 
 def main():
-    print("🔍 Checking Django Book Management System Requirements...\n")
+    print("🔍 Checking Django Book Management System Requirements (PostgreSQL)...\n")
     
     all_good = True
     
@@ -60,18 +60,15 @@ def main():
     # Check required packages
     packages = [
         ("Django", "django"),
-        ("MySQL Client", "MySQLdb"),  # This will check mysqlclient
+        ("PostgreSQL Adapter", "psycopg2"),
+        ("Pillow", "PIL"),
     ]
     
     for package_name, import_name in packages:
         all_good &= check_package(package_name, import_name)
     
-    # If MySQLdb fails, try PyMySQL
-    if not check_package("PyMySQL Alternative", "pymysql"):
-        print("   ℹ️  Consider installing PyMySQL as alternative")
-    
     print("\n🗄️  Checking Database Connection:")
-    all_good &= check_mysql_connection()
+    all_good &= check_postgresql_connection()
     
     print("\n" + "="*50)
     if all_good:
@@ -83,6 +80,7 @@ def main():
     else:
         print("⚠️  Some requirements are missing. Please install them:")
         print("pip install -r requirements.txt")
+        print("Or use conda: conda env create -f environment.yml")
     
     return 0 if all_good else 1
 

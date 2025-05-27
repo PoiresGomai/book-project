@@ -22,6 +22,9 @@
             --warning-color: #f39c12;
             --light-bg: #ecf0f1;
             --dark-text: #2c3e50;
+            --footer-bg: #1a1a2e;
+            --footer-secondary: #16213e;
+            --footer-accent: #0f3460;
         }
         
         body {
@@ -120,68 +123,371 @@
         }
         
         .footer {
-            background: var(--primary-color);
-            color: white;
-            padding: 40px 0 20px 0;
-            margin-top: 60px;
+            background: linear-gradient(135deg, var(--footer-bg) 0%, var(--footer-secondary) 50%, var(--footer-accent) 100%);
+            color: #ffffff;
+            padding: 60px 0 20px 0;
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
         }
         
-        .book-card {
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color), var(--success-color), var(--warning-color));
+        }
+        
+        .footer-section {
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .footer-section.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .footer-logo i {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-right: 15px;
+        }
+        
+        .footer-logo h4 {
+            margin: 0;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 1.5rem;
+        }
+        
+        .footer-description {
+            color: #b8c6db;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .social-link:hover {
+            background: var(--secondary-color);
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+        
+        .social-link i {
+            font-size: 1.2rem;
+        }
+        
+        .footer-title {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #b8c6db;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary-color);
+            padding-left: 8px;
+        }
+        
+        .footer-links a i {
+            font-size: 0.8rem;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        
+        .contact-info {
+            margin-bottom: 25px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
             transition: all 0.3s ease;
         }
         
-        .book-card:hover {
-            transform: scale(1.05);
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
         }
         
-        .price-tag {
-            background: linear-gradient(45deg, var(--accent-color), #ff6b6b);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            display: inline-block;
+        .contact-item i {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-right: 15px;
+            margin-top: 2px;
+            min-width: 20px;
         }
         
-        .inventory-badge {
-            background: var(--success-color);
-            color: white;
-            padding: 3px 12px;
-            border-radius: 15px;
+        .contact-details strong {
+            display: block;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 4px;
             font-size: 0.9rem;
         }
         
-        .navbar {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            background: white !important;
+        .contact-details span {
+            color: #b8c6db;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
         
-        .navbar-nav .nav-link {
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            margin: 0 5px;
-            transition: all 0.3s ease;
+        .admin-access {
+            margin-top: 25px;
         }
         
-        .navbar-nav .nav-link:hover {
-            background: var(--light-bg);
-            color: var(--secondary-color) !important;
-        }
-        
-        .admin-link {
-            background: linear-gradient(45deg, var(--accent-color), #ff6b6b);
-            color: white !important;
-            border-radius: 20px;
-            padding: 8px 20px;
-            text-decoration: none;
+        .admin-access .btn {
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+            padding: 10px 20px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             transition: all 0.3s ease;
         }
         
-        .admin-link:hover {
-            background: linear-gradient(45deg, #c0392b, var(--accent-color));
-            color: white !important;
+        .admin-access .btn:hover {
+            background: var(--secondary-color);
+            color: #ffffff;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .footer-divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            margin: 40px 0 30px 0;
+        }
+        
+        .footer-bottom {
+            padding-top: 20px;
+        }
+        
+        .copyright p {
+            color: #8892b0;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .legal-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .legal-links a {
+            color: #b8c6db;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+        
+        .legal-links a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .legal-links span {
+            color: #6c7b8a;
+            font-size: 0.8rem;
+        }
+        
+        .footer-tech {
+            text-align: right;
+        }
+        
+        .footer-tech p {
+            color: #8892b0;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .footer-tech i {
+            color: var(--warning-color);
+            font-size: 1.1rem;
+        }
+        
+        .footer-tech strong {
+            color: var(--secondary-color);
+        }
+        
+        .version-info {
+            margin: 0;
+        }
+        
+        .version-info small {
+            color: #6c7b8a;
+            font-size: 0.8rem;
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .back-to-top i {
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .footer {
+                padding: 40px 0 20px 0;
+                margin-top: 40px;
+            }
+            
+            .footer-logo {
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .footer-tech {
+                text-align: center;
+                margin-top: 20px;
+            }
+            
+            .footer-tech p {
+                justify-content: center;
+            }
+            
+            .legal-links {
+                justify-content: center;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .contact-item {
+                padding: 10px;
+            }
+            
+            .footer-section {
+                text-align: center;
+            }
+            
+            .footer-title::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .footer-logo h4 {
+                font-size: 1.3rem;
+            }
+            
+            .footer-description {
+                font-size: 0.9rem;
+            }
+            
+            .contact-details {
+                font-size: 0.85rem;
+            }
         }
     </style>
     
@@ -241,42 +547,140 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <h5><i class="fas fa-book-open"></i> 图书管理系统</h5>
-                    <p class="mb-0">现代化的图书管理平台，为读者提供便捷的图书浏览和查询服务。</p>
+            <!-- Main Footer Content -->
+            <div class="row g-4">
+                <!-- Company Information -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-section">
+                        <div class="footer-logo">
+                            <i class="fas fa-book-reader"></i>
+                            <h4>图书管理系统</h4>
+                        </div>
+                        <p class="footer-description">
+                            现代化的智能图书管理平台，为读者和管理员提供便捷、高效的图书查询、浏览和管理服务。致力于推广阅读文化，建设知识型社会。
+                        </p>
+                        <div class="social-links">
+                            <a href="#" class="social-link" title="微博">
+                                <i class="fab fa-weibo"></i>
+                            </a>
+                            <a href="#" class="social-link" title="微信公众号">
+                                <i class="fab fa-weixin"></i>
+                            </a>
+                            <a href="#" class="social-link" title="GitHub">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="social-link" title="邮箱">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6>快速导航</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'public_home' %}" class="text-light">首页</a></li>
-                        <li><a href="{% url 'public_books' %}" class="text-light">图书目录</a></li>
-                        <li><a href="{% url 'public_authors' %}" class="text-light">作者</a></li>
-                        <li><a href="{% url 'public_publishers' %}" class="text-light">出版社</a></li>
-                    </ul>
+                
+                <!-- Quick Navigation -->
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-section">
+                        <h5 class="footer-title">快速导航</h5>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'public_home' %}"><i class="fas fa-chevron-right"></i>首页</a></li>
+                            <li><a href="{% url 'public_books' %}"><i class="fas fa-chevron-right"></i>图书目录</a></li>
+                            <li><a href="{% url 'public_authors' %}"><i class="fas fa-chevron-right"></i>作者列表</a></li>
+                            <li><a href="{% url 'public_publishers' %}"><i class="fas fa-chevron-right"></i>出版社</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h6>联系信息</h6>
-                    <p class="mb-1"><i class="fas fa-envelope"></i> info@bookmanagement.com</p>
-                    <p class="mb-1"><i class="fas fa-phone"></i> +86 123 4567 8900</p>
-                    <p class="mb-0"><i class="fas fa-map-marker-alt"></i> 中国，某某市</p>
+                
+                <!-- Services -->
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-section">
+                        <h5 class="footer-title">系统功能</h5>
+                        <ul class="footer-links">
+                            <li><a href="#"><i class="fas fa-chevron-right"></i>图书查询</a></li>
+                            <li><a href="#"><i class="fas fa-chevron-right"></i>库存管理</a></li>
+                            <li><a href="#"><i class="fas fa-chevron-right"></i>销售统计</a></li>
+                            <li><a href="#"><i class="fas fa-chevron-right"></i>用户管理</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h6>管理员入口</h6>
-                    <a href="/manager/login/" class="btn btn-outline-light btn-modern">
-                        <i class="fas fa-sign-in-alt"></i> 管理员登录
-                    </a>
+                
+                <!-- Contact Information -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-section">
+                        <h5 class="footer-title">联系我们</h5>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="contact-details">
+                                    <strong>地址</strong>
+                                    <span>北京市海淀区中关村科技园区</span>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <div class="contact-details">
+                                    <strong>电话</strong>
+                                    <span>+86 136 7130 9752</span>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div class="contact-details">
+                                    <strong>邮箱</strong>
+                                    <span> espoirmoukendi@gmail.com</span>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-clock"></i>
+                                <div class="contact-details">
+                                    <strong>服务时间</strong>
+                                    <span>周一至周五 9:00-18:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Management Access -->
+                        <div class="admin-access">
+                            <a href="/manager/login/" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-user-shield"></i> 管理员入口
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <hr class="my-4">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2024 图书管理系统. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0">Powered by Django & Bootstrap</p>
+            
+            <!-- Footer Bottom -->
+            <hr class="footer-divider">
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="copyright">
+                            <p>&copy; 2024 图书管理系统. 保留所有权利.</p>
+                            <div class="legal-links">
+                                <a href="#">隐私政策</a>
+                                <span>|</span>
+                                <a href="#">使用条款</a>
+                                <span>|</span>
+                                <a href="#">网站地图</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="footer-tech">
+                            <p class="mb-0">
+                                <i class="fab fa-python"></i> Powered by 
+                                <strong>Django</strong> & <strong>PostgreSQL</strong>
+                            </p>
+                            <p class="version-info">
+                                <small>Version 2.0 | 最后更新: 2024年12月</small>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Back to Top Button -->
+        <div class="back-to-top" id="backToTop">
+            <i class="fas fa-chevron-up"></i>
         </div>
     </footer>
     
@@ -294,10 +698,50 @@
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
+        });
+        
+        // Back to top functionality
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Footer animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe footer sections
+        document.querySelectorAll('.footer-section').forEach(section => {
+            observer.observe(section);
         });
     </script>
     

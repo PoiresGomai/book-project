@@ -173,6 +173,50 @@
             margin-bottom: 15px;
             color: #adb5bd;
         }
+        
+        .book-cover {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .book-cover-img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .book-cover-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .book-description {
+            color: #555;
+            font-style: italic;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+        
+        .book-description i {
+            color: #667eea;
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .book-cover {
+                text-align: center;
+            }
+            
+            .book-cover-img {
+                height: 150px;
+                width: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -203,22 +247,37 @@
                     {% if books %}
                         {% for book in books %}
                         <div class="book-card">
-                            <div class="book-title">{{ book.name }}</div>
-                            <div class="book-meta">
-                                <i class="fas fa-building"></i>出版社: {{ book.publisher.publisher_name }}
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="book-cover">
+                                        <img src="{{ book.get_cover_url }}" alt="{{ book.name }}" class="img-fluid book-cover-img">
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="book-title">{{ book.name }}</div>
+                                    {% if book.description %}
+                                    <div class="book-description">
+                                        <i class="fas fa-quote-left"></i>
+                                        {{ book.get_medium_description }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="book-meta">
+                                        <i class="fas fa-building"></i>出版社: {{ book.publisher.publisher_name }}
+                                    </div>
+                                    <div class="book-meta">
+                                        <i class="fas fa-map-marker-alt"></i>出版地址: {{ book.publisher.publisher_address }}
+                                    </div>
+                                    <div class="book-meta">
+                                        <i class="fas fa-boxes"></i>库存: {{ book.inventory }} 本
+                                    </div>
+                                    <div class="book-meta">
+                                        <i class="fas fa-chart-line"></i>销量: {{ book.sale_num }} 本
+                                    </div>
+                                    <span class="price-tag">
+                                        <i class="fas fa-tag"></i> ¥{{ book.price }}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="book-meta">
-                                <i class="fas fa-map-marker-alt"></i>出版地址: {{ book.publisher.publisher_address }}
-                            </div>
-                            <div class="book-meta">
-                                <i class="fas fa-boxes"></i>库存: {{ book.inventory }} 本
-                            </div>
-                            <div class="book-meta">
-                                <i class="fas fa-chart-line"></i>销量: {{ book.sale_num }} 本
-                            </div>
-                            <span class="price-tag">
-                                <i class="fas fa-tag"></i> ¥{{ book.price }}
-                            </span>
                         </div>
                         {% endfor %}
                     {% else %}

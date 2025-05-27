@@ -1,0 +1,436 @@
+{% extends 'public/base.html' %}
+
+{% block title %}结账 - 图书管理系统{% endblock %}
+
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .step-indicator {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+    
+    .step {
+        display: flex;
+        align-items: center;
+        margin: 0 15px;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #6c757d;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    
+    .step.active .step-number {
+        background: #007bff;
+    }
+    
+    .step.completed .step-number {
+        background: #28a745;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .payment-methods {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .payment-option {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-option:hover {
+        border-color: #007bff;
+        background: #f8f9fa;
+    }
+    
+    .payment-option.selected {
+        border-color: #007bff;
+        background: #e3f2fd;
+    }
+    
+    .payment-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #6c757d;
+    }
+    
+    .payment-option.selected .payment-icon {
+        color: #007bff;
+    }
+    
+    .order-summary {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        position: sticky;
+        top: 20px;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .summary-item:last-child {
+        border-bottom: none;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .book-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .book-info {
+        flex: 1;
+        margin-left: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 12px 15px;
+    }
+    
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+    
+    .btn-checkout {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-checkout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+    }
+</style>
+
+<div class="checkout-container">
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step completed">
+            <div class="step-number">1</div>
+            <span>选择商品</span>
+        </div>
+        <div class="step active">
+            <div class="step-number">2</div>
+            <span>填写信息</span>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <span>完成订单</span>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'checkout' %}" id="checkoutForm">
+        {% csrf_token %}
+        <div class="row">
+            <!-- Left Column - Forms -->
+            <div class="col-lg-8">
+                <!-- Customer Information -->
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-user"></i> 客户信息</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">姓名 *</label>
+                                <input type="text" name="customer_name" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">邮箱 *</label>
+                                <input type="email" name="customer_email" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">电话号码 *</label>
+                        <input type="tel" name="customer_phone" class="form-control" required>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-truck"></i> 收货地址</h4>
+                    <div class="form-group">
+                        <label class="form-label">详细地址 *</label>
+                        <textarea name="shipping_address" class="form-control" rows="3" required 
+                                  placeholder="请输入详细的收货地址"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">城市 *</label>
+                                <input type="text" name="shipping_city" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">省/州 *</label>
+                                <input type="text" name="shipping_state" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label">邮政编码 *</label>
+                                <input type="text" name="shipping_postal_code" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">国家 *</label>
+                        <select name="shipping_country" class="form-control" required>
+                            <option value="">请选择国家</option>
+                            <option value="中国">中国</option>
+                            <option value="美国">美国</option>
+                            <option value="英国">英国</option>
+                            <option value="德国">德国</option>
+                            <option value="法国">法国</option>
+                            <option value="日本">日本</option>
+                            <option value="韩国">韩国</option>
+                            <option value="新加坡">新加坡</option>
+                            <option value="澳大利亚">澳大利亚</option>
+                            <option value="加拿大">加拿大</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-credit-card"></i> 支付方式</h4>
+                    <input type="hidden" name="payment_method" id="selectedPaymentMethod" required>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-option" data-method="wechat">
+                            <div class="payment-icon">
+                                <i class="fab fa-weixin" style="color: #07c160;"></i>
+                            </div>
+                            <div class="payment-name">微信支付</div>
+                            <small class="text-muted">安全便捷的移动支付</small>
+                        </div>
+                        
+                        <div class="payment-option" data-method="alipay">
+                            <div class="payment-icon">
+                                <i class="fab fa-alipay" style="color: #1677ff;"></i>
+                            </div>
+                            <div class="payment-name">支付宝</div>
+                            <small class="text-muted">值得信赖的数字支付</small>
+                        </div>
+                        
+                        <div class="payment-option" data-method="bank_card">
+                            <div class="payment-icon">
+                                <i class="fas fa-credit-card" style="color: #6c757d;"></i>
+                            </div>
+                            <div class="payment-name">银行卡</div>
+                            <small class="text-muted">信用卡/借记卡支付</small>
+                        </div>
+                        
+                        <div class="payment-option" data-method="paypal">
+                            <div class="payment-icon">
+                                <i class="fab fa-paypal" style="color: #0070ba;"></i>
+                            </div>
+                            <div class="payment-name">PayPal</div>
+                            <small class="text-muted">国际安全支付</small>
+                        </div>
+                        
+                        <div class="payment-option" data-method="orange_money">
+                            <div class="payment-icon">
+                                <i class="fas fa-mobile-alt" style="color: #ff7900;"></i>
+                            </div>
+                            <div class="payment-name">Orange Money</div>
+                            <small class="text-muted">移动钱包支付</small>
+                        </div>
+                        
+                        <div class="payment-option" data-method="mtn_money">
+                            <div class="payment-icon">
+                                <i class="fas fa-mobile-alt" style="color: #ffcb05;"></i>
+                            </div>
+                            <div class="payment-name">MTN Money</div>
+                            <small class="text-muted">移动钱包支付</small>
+                        </div>
+                        
+                        <div class="payment-option" data-method="airtel_money">
+                            <div class="payment-icon">
+                                <i class="fas fa-mobile-alt" style="color: #ed1c24;"></i>
+                            </div>
+                            <div class="payment-name">Airtel Money</div>
+                            <small class="text-muted">移动钱包支付</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Notes -->
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-comment"></i> 备注信息</h4>
+                    <div class="form-group">
+                        <label class="form-label">订单备注</label>
+                        <textarea name="customer_notes" class="form-control" rows="3" 
+                                  placeholder="如有特殊要求，请在此说明（可选）"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h4 class="mb-3"><i class="fas fa-receipt"></i> 订单摘要</h4>
+                    
+                    <!-- Cart Items -->
+                    <div class="cart-items mb-3">
+                        {% for item in cart_items %}
+                        <div class="book-item">
+                            <div class="book-cover">
+                                {% if item.book.cover_image %}
+                                    <img src="{{ item.book.cover_image.url }}" alt="{{ item.book.name }}" 
+                                         style="width: 60px; height: 80px; object-fit: cover; border-radius: 5px;">
+                                {% else %}
+                                    <div style="width: 60px; height: 80px; background: #f8f9fa; border-radius: 5px; 
+                                                display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-book text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="book-info">
+                                <h6 class="mb-1">{{ item.book.name }}</h6>
+                                <p class="text-muted mb-1">{{ item.book.publisher.publisher_name }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <span>¥{{ item.book.price }} × {{ item.quantity }}</span>
+                                    <strong>¥{{ item.get_total_price }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Summary -->
+                    <div class="summary-details">
+                        <div class="summary-item">
+                            <span>商品总计:</span>
+                            <span>¥{{ total_amount }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>运费:</span>
+                            <span class="text-success">免费</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>订单总额:</span>
+                            <span class="text-primary">¥{{ total_amount }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Checkout Button -->
+                    <button type="submit" class="btn btn-success btn-checkout mt-3">
+                        <i class="fas fa-lock"></i> 确认订单并支付
+                    </button>
+                    
+                    <!-- Security Notice -->
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt"></i> 
+                            您的支付信息经过安全加密保护
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Payment method selection
+document.querySelectorAll('.payment-option').forEach(option => {
+    option.addEventListener('click', function() {
+        // Remove selected class from all options
+        document.querySelectorAll('.payment-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked option
+        this.classList.add('selected');
+        
+        // Set hidden input value
+        document.getElementById('selectedPaymentMethod').value = this.dataset.method;
+    });
+});
+
+// Form validation
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    const paymentMethod = document.getElementById('selectedPaymentMethod').value;
+    if (!paymentMethod) {
+        e.preventDefault();
+        alert('请选择支付方式');
+        return false;
+    }
+    
+    // Additional validation can be added here
+    return true;
+});
+
+// Auto-fill country based on payment method
+document.querySelectorAll('.payment-option').forEach(option => {
+    option.addEventListener('click', function() {
+        const method = this.dataset.method;
+        const countrySelect = document.querySelector('[name="shipping_country"]');
+        
+        // Auto-fill country based on payment method
+        if (method === 'wechat' || method === 'alipay') {
+            countrySelect.value = '中国';
+        } else if (method === 'orange_money' || method === 'mtn_money' || method === 'airtel_money') {
+            // For African mobile money services
+            countrySelect.value = ''; // Let user choose specific African country
+        }
+    });
+});
+</script>
+{% endblock %}

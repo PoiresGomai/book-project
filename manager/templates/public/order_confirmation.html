@@ -1,0 +1,263 @@
+{% extends 'public/base.html' %}
+
+{% block title %}订单确认 - {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<style>
+    .confirmation-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    
+    .success-header {
+        text-align: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border-radius: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .success-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+    
+    .order-details {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .payment-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .btn-track {
+        background: #007bff;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-track:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .btn-continue {
+        background: #28a745;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-continue:hover {
+        background: #1e7e34;
+        transform: translateY(-2px);
+        color: white;
+    }
+</style>
+
+<div class="confirmation-container">
+    <!-- Success Header -->
+    <div class="success-header">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>订单创建成功！</h2>
+        <p class="mb-0">感谢您的购买，我们将尽快为您处理订单</p>
+    </div>
+
+    <!-- Order Details -->
+    <div class="order-details">
+        <h4 class="mb-4"><i class="fas fa-receipt"></i> 订单详情</h4>
+        
+        <div class="detail-row">
+            <span><strong>订单号:</strong></span>
+            <span class="text-primary fw-bold">{{ order.order_number }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span><strong>下单时间:</strong></span>
+            <span>{{ order.created_at|date:"Y年m月d日 H:i" }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span><strong>订单状态:</strong></span>
+            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span><strong>客户姓名:</strong></span>
+            <span>{{ order.customer_name }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span><strong>联系邮箱:</strong></span>
+            <span>{{ order.customer_email }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span><strong>联系电话:</strong></span>
+            <span>{{ order.customer_phone }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span><strong>收货地址:</strong></span>
+            <span>{{ order.shipping_address }}, {{ order.shipping_city }}, {{ order.shipping_state }}, {{ order.shipping_country }} {{ order.shipping_postal_code }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span><strong>支付方式:</strong></span>
+            <span>{{ order.get_payment_method_display }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span><strong>订单总额:</strong></span>
+            <span class="text-success">¥{{ order.total_amount }}</span>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="order-details">
+        <h4 class="mb-4"><i class="fas fa-books"></i> 订单商品</h4>
+        
+        {% for item in order_items %}
+        <div class="d-flex align-items-center p-3 border-bottom">
+            <div class="book-cover me-3">
+                {% if item.book.cover_image %}
+                    <img src="{{ item.book.cover_image.url }}" alt="{{ item.book.name }}" 
+                         style="width: 60px; height: 80px; object-fit: cover; border-radius: 5px;">
+                {% else %}
+                    <div style="width: 60px; height: 80px; background: #f8f9fa; border-radius: 5px; 
+                                display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-book text-muted"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                <h6 class="mb-1">{{ item.book.name }}</h6>
+                <p class="text-muted mb-1">{{ item.book.publisher.publisher_name }}</p>
+                <div class="d-flex justify-content-between">
+                    <span>单价: ¥{{ item.unit_price }} × {{ item.quantity }}</span>
+                    <strong class="text-primary">¥{{ item.total_price }}</strong>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Payment Information -->
+    <div class="payment-info">
+        <h5><i class="fas fa-credit-card"></i> 支付信息</h5>
+        <p class="mb-2"><strong>支付方式:</strong> {{ order.get_payment_method_display }}</p>
+        <p class="mb-2"><strong>应付金额:</strong> <span class="text-success fw-bold">¥{{ order.total_amount }}</span></p>
+        
+        {% if order.status == 'pending' %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>待付款</strong> - 请在24小时内完成支付，否则订单将自动取消
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Customer Notes -->
+    {% if order.customer_notes %}
+    <div class="order-details">
+        <h5><i class="fas fa-comment"></i> 客户备注</h5>
+        <p class="text-muted">{{ order.customer_notes }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{% url 'track_order' %}" class="btn-track">
+            <i class="fas fa-search"></i> 跟踪订单
+        </a>
+        <a href="{% url 'public_books' %}" class="btn-continue">
+            <i class="fas fa-shopping-cart"></i> 继续购书
+        </a>
+    </div>
+
+    <!-- Important Notice -->
+    <div class="alert alert-info mt-4">
+        <h6><i class="fas fa-info-circle"></i> 重要提醒</h6>
+        <ul class="mb-0">
+            <li>请保存好您的订单号: <strong>{{ order.order_number }}</strong></li>
+            <li>订单确认邮件已发送至: <strong>{{ order.customer_email }}</strong></li>
+            <li>如有疑问，请联系客服并提供订单号</li>
+            <li>您可以随时使用订单号和邮箱查询订单状态</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Auto-copy order number on click
+document.addEventListener('DOMContentLoaded', function() {
+    const orderNumber = document.querySelector('.text-primary.fw-bold');
+    if (orderNumber) {
+        orderNumber.style.cursor = 'pointer';
+        orderNumber.title = '点击复制订单号';
+        
+        orderNumber.addEventListener('click', function() {
+            navigator.clipboard.writeText(this.textContent).then(function() {
+                // Show copied message
+                const originalText = orderNumber.textContent;
+                orderNumber.textContent = '已复制!';
+                orderNumber.style.color = '#28a745';
+                
+                setTimeout(function() {
+                    orderNumber.textContent = originalText;
+                    orderNumber.style.color = '';
+                }, 2000);
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
