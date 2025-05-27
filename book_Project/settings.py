@@ -14,7 +14,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # 设置允许哪些主机访问我们的django后台站点，
 # 如果项目上线部署到远程服务器，那就必须设置allow_host为本地的ipv4地址
 # (设置为"*"也可以，但是不安全)，否则本地是无法访问远程的django站点
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = []
 
 
 # 应用程序定义
