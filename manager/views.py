@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from manager import models
 
 
@@ -28,7 +28,19 @@ def manager_login(request):
             # 将数据渲染到页面上
             return render(request, 'book/book_list.html', {'book_obj_list': book_obj_list, "name": name})
         return redirect("/manager/login")
-        # 3.重添加成功，返回出版社列表
+
+
+# ====================   管理员登出  ===========================
+def manager_logout(request):
+    """Manager logout function - renamed from logout to avoid conflicts"""
+    request.session.clear()
+    return render(request, "admin/admin.html")
+
+
+# Keep the old logout function for backward compatibility
+def logout(request):
+    """Legacy logout function - redirects to manager_logout"""
+    return manager_logout(request)
 
 
 # ====================   一、出版社模块  ===========================
@@ -260,12 +272,131 @@ def delete_author(request):
     id = request.GET.get('id')
     # 2删除作者
     models.Author.objects.filter(id=id).delete()
-    # 3重定向作者列表
-    return redirect('/admin/author_list')
+    # 3重定向作者列表 - Fixed URL
+    return redirect('/manager/author_list')
 
 
-# ==================================其他功能===========================
-# 退出系统
-def logout(request):
-    request.session.clear()
-    return render(request, "admin/admin.html")
+# ====================   PUBLIC USER INTERFACE  ===========================
+
+def public_home(request):
+    """Public homepage with book statistics and featured content"""
+    book_count = models.Book.objects.count()
+    author_count = models.Author.objects.count()
+    publisher_count = models.Publisher.objects.count()
+    
+    # Get featured books (top 6 by sales)
+    featured_books = models.Book.objects.select_related('publisher').order_by('-sale_num')[:6]
+    
+    # Recent books (last 8 added)
+    recent_books = models.Book.objects.select_related('publisher').order_by('-id')[:8]
+    
+    context = {
+        'book_count': book_count,
+        'author_count': author_count,
+        'publisher_count': publisher_count,
+        'featured_books': featured_books,
+        'recent_books': recent_books,
+    }
+    return render(request, 'public/home.html', context)
+
+def public_books(request):
+    """Public book listing with search and pagination"""
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', 'name')
+    
+    books = models.Book.objects.select_related('publisher')
+    
+    if search_query:
+        books = books.filter(name__icontains=search_query)
+    
+    # Sorting options
+    if sort_by == 'price_low':
+        books = books.order_by('price')
+    elif sort_by == 'price_high':
+        books = books.order_by('-price')
+    elif sort_by == 'popular':
+        books = books.order_by('-sale_num')
+    else:
+        books = books.order_by('name')
+    
+    context = {
+        'books': books,
+        'search_query': search_query,
+        'sort_by': sort_by,
+    }
+    return render(request, 'public/books.html', context)
+
+def public_book_detail(request, book_id):
+    """Public book detail view"""
+    book = get_object_or_404(models.Book.objects.select_related('publisher'), id=book_id)
+    authors = book.author_set.all()
+    
+    # Related books by same publisher
+    related_books = models.Book.objects.filter(
+        publisher=book.publisher
+    ).exclude(id=book.id)[:4]
+    
+    context = {
+        'book': book,
+        'authors': authors,
+        'related_books': related_books,
+    }
+    return render(request, 'public/book_detail.html', context)
+
+def public_authors(request):
+    """Public authors listing"""
+    search_query = request.GET.get('search', '')
+    
+    # Fix: Use 'book' instead of 'book_set' for ManyToMany relationship
+    authors = models.Author.objects.prefetch_related('book').all()
+    
+    if search_query:
+        authors = authors.filter(name__icontains=search_query)
+    
+    authors = authors.order_by('name')
+    
+    context = {
+        'authors': authors,
+        'search_query': search_query,
+    }
+    return render(request, 'public/authors.html', context)
+
+def public_author_detail(request, author_id):
+    """Public author detail view"""
+    author = get_object_or_404(models.Author, id=author_id)
+    # Fix: Use 'book' instead of 'book_set' for ManyToMany relationship
+    books = author.book.select_related('publisher').all()
+    
+    context = {
+        'author': author,
+        'books': books,
+    }
+    return render(request, 'public/author_detail.html', context)
+
+def public_publishers(request):
+    """Public publishers listing"""
+    search_query = request.GET.get('search', '')
+    
+    publishers = models.Publisher.objects.all()
+    
+    if search_query:
+        publishers = publishers.filter(publisher_name__icontains=search_query)
+    
+    publishers = publishers.order_by('publisher_name')
+    
+    context = {
+        'publishers': publishers,
+        'search_query': search_query,
+    }
+    return render(request, 'public/publishers.html', context)
+
+def public_publisher_detail(request, publisher_id):
+    """Public publisher detail view"""
+    publisher = get_object_or_404(models.Publisher, id=publisher_id)
+    books = models.Book.objects.filter(publisher=publisher).order_by('name')
+    
+    context = {
+        'publisher': publisher,
+        'books': books,
+    }
+    return render(request, 'public/publisher_detail.html', context)

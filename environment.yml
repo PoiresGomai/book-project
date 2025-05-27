@@ -1,0 +1,12 @@
+name: book_project
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - django=4.1
+  - mysqlclient
+  - pillow
+  - pip
+  - pip:
+    - python-decouple

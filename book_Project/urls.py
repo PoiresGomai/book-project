@@ -1,6 +1,9 @@
+from django.contrib import admin
 from django.urls import path, include
 
-# 主路由（进入各个模块的入口）
+# Main URL patterns
 urlpatterns = [
-    path("manager/", include("manager.urls"))
+    path('admin/', admin.site.urls),  # Django admin
+    path('manager/', include('manager.urls')),  # Public interface at /manager/
+    path('', include('manager.urls')),  # Also accessible from root
 ]

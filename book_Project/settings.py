@@ -64,16 +64,27 @@ WSGI_APPLICATION = 'book_Project.wsgi.application'
 
 
 # 数据库配置
+# Database configuration for the book management system
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_book',
-        'USER': 'root',
-        'PASSWORD': '',
+        'USER': 'bookuser',                    # Use dedicated user
+        'PASSWORD': 'BookProject123!',        # Use the password you set
         'HOST': '127.0.0.1',
-        'PORT': 3306,
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'autocommit': True,
+        },
     }
 }
+
+# For production, use environment variables:
+# 'USER': os.environ.get('DB_USER', 'bookuser'),
+# 'PASSWORD': os.environ.get('DB_PASSWORD', 'BookProject123!'),
 
 
 # 密码验证

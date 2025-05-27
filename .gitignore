@@ -76,3 +76,8 @@ logs/
 
 # Secret files
 secrets.py
+
+# Markdown files
+*.md
+*.txt
+
