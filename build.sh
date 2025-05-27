@@ -2,17 +2,23 @@
 # Exit on error
 set -o errexit
 
-# Install dependencies
+echo "==> Installing Python dependencies..."
 pip install -r requirements.txt
 
-# Collect static files
+echo "==> Collecting static files..."
 python manage.py collectstatic --no-input
 
-# Apply database migrations
+echo "==> Running database migrations..."
 python manage.py migrate
 
-# Create default manager account if it doesn't exist
+echo "==> Creating default manager account if it doesn't exist..."
 python manage.py shell -c "
-from manager.models import Manager;
-Manager.objects.filter(number='admin').exists() or Manager.objects.create(number='admin', password='admin123', name='Administrator')
+from manager.models import Manager
+if not Manager.objects.filter(number='admin').exists():
+    Manager.objects.create(number='admin', password='admin123', name='Administrator')
+    print('Created default admin account')
+else:
+    print('Admin account already exists')
 "
+
+echo "==> Build completed successfully!"

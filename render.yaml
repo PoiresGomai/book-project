@@ -5,7 +5,7 @@ services:
     region: singapore
     plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn book_Project.wsgi:application"
+    startCommand: "gunicorn book_Project.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DEBUG
         value: False
@@ -17,6 +17,10 @@ services:
         value: "*"
       - key: PYTHONUNBUFFERED
         value: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: book-management-db
+          property: connectionString
 
 databases:
   - name: book-management-db
