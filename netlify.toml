@@ -1,0 +1,33 @@
+[build]
+  # Since this is a Django project being converted to static
+  publish = "static_build"
+  command = "python manage.py collectstatic --noinput && python generate_static.py"
+
+[build.environment]
+  PYTHON_VERSION = "3.9"
+
+[[redirects]]
+  from = "/"
+  to = "/public/"
+  status = 302
+
+[[redirects]]
+  from = "/manager/*"
+  to = "/static-notice.html"
+  status = 200
+
+[[redirects]]
+  from = "/public/*"
+  to = "/public/index.html"
+  status = 200
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
