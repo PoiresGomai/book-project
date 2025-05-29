@@ -2,6 +2,8 @@ from django.urls import path, re_path
 from manager import views
 
 # manager中转路由
+app_name = 'manager'
+
 urlpatterns = [
     # 指定跳转 - Default redirect to login
     re_path(r'^$', views.index),
@@ -9,6 +11,10 @@ urlpatterns = [
     # =========================管理员登录========================
     path("login/", views.manager_login, name='manager_login'),
     path("logout/", views.manager_logout, name='manager_logout'),
+
+    # =========================Dashboard and analytics========================
+    path("dashboard/", views.manager_dashboard, name='manager_dashboard'),
+    path('dashboard/analytics/', views.dashboard_analytics_api, name='dashboard_analytics_api'),
 
     # =========================出版社========================
     path("add_publisher/", views.add_publisher, name='add_publisher'),
@@ -35,8 +41,7 @@ urlpatterns = [
     path('public/authors/', views.public_authors, name='public_authors'),
     path('public/authors/<int:author_id>/', views.public_author_detail, name='public_author_detail'),
     path('public/publishers/', views.public_publishers, name='public_publishers'),
-    path('public/publishers/<int:publisher_id>/', views.public_publisher_detail, name='public_publisher_detail'),
-
+    path('public/publishers/<int:publisher_id>/', views.public_publisher_detail, name='public_publisher_detail'),    
     # =========================E-commerce URLs========================
     path('cart/add/<int:book_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/', views.view_cart, name='view_cart'),
@@ -47,4 +52,11 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('order-confirmation/<str:order_number>/', views.order_confirmation, name='order_confirmation'),
     path('track-order/', views.track_order, name='track_order'),
+
+    # =========================Order Management URLs========================
+    path("order_list/", views.order_list, name='order_list'),
+    path("order_detail/<int:order_id>/", views.order_detail, name='order_detail'),
+    path("update_order_status/", views.update_order_status, name='update_order_status'),
+    path("update_payment_status/", views.update_payment_status, name='update_payment_status'),
+    path("export_orders/", views.export_orders, name='export_orders'),
 ]

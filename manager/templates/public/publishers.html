@@ -77,7 +77,7 @@
                             </div>
                             
                             <div class="mt-auto">
-                                <a href="{% url 'public_publisher_detail' publisher.id %}" class="btn btn-outline-primary w-100">
+                                <a href="{% url 'manager:public_publisher_detail' publisher.id %}" class="btn btn-outline-primary w-100">
                                     <i class="fas fa-info-circle"></i> 查看详情
                                 </a>
                             </div>
@@ -94,7 +94,7 @@
                 </div>
                 <h4 class="text-muted mb-3">未找到相关出版社</h4>
                 <p class="text-muted mb-4">请尝试其他搜索关键词或浏览所有出版社</p>
-                <a href="{% url 'public_publishers' %}" class="btn btn-primary-modern">
+                <a href="{% url 'manager:public_publishers' %}" class="btn btn-primary-modern">
                     <i class="fas fa-building"></i> 浏览所有出版社
                 </a>
             </div>
@@ -107,21 +107,21 @@
         <div class="container">
             <div class="row text-center">
                 <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="100">
-                    <a href="{% url 'public_books' %}" class="text-white text-decoration-none">
+                    <a href="{% url 'manager:public_books' %}" class="text-white text-decoration-none">
                         <i class="fas fa-book fa-3x mb-3"></i>
                         <h5>浏览图书</h5>
                         <p class="mb-0">查看所有图书信息</p>
                     </a>
                 </div>
                 <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="200">
-                    <a href="{% url 'public_authors' %}" class="text-white text-decoration-none">
+                    <a href="{% url 'manager:public_authors' %}" class="text-white text-decoration-none">
                         <i class="fas fa-user-edit fa-3x mb-3"></i>
                         <h5>浏览作者</h5>
                         <p class="mb-0">查看所有作者信息</p>
                     </a>
                 </div>
                 <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="300">
-                    <a href="{% url 'public_home' %}" class="text-white text-decoration-none">
+                    <a href="{% url 'manager:public_home' %}" class="text-white text-decoration-none">
                         <i class="fas fa-home fa-3x mb-3"></i>
                         <h5>返回首页</h5>
                         <p class="mb-0">回到主页面</p>

@@ -111,7 +111,7 @@
                 
                 <!-- Continue Shopping -->
                 <div class="mt-4">
-                    <a href="{% url 'public_books' %}" class="btn btn-outline-primary">
+                    <a href="{% url 'manager:public_books' %}" class="btn btn-outline-primary">
                         <i class="fas fa-arrow-left"></i> 继续购物
                     </a>
                 </div>
@@ -139,7 +139,7 @@
                         </div>
                         
                         <div class="d-grid">
-                            <a href="{% url 'checkout' %}" class="btn btn-success btn-lg">
+                            <a href="{% url 'manager:checkout' %}" class="btn btn-success btn-lg">
                                 <i class="fas fa-credit-card"></i> 立即结算
                             </a>
                         </div>
@@ -165,7 +165,7 @@
             <i class="fas fa-shopping-cart text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
             <h4 class="mt-4 text-muted">购物车为空</h4>
             <p class="text-muted mb-4">还没有添加任何商品到购物车</p>
-            <a href="{% url 'public_books' %}" class="btn btn-primary btn-lg">
+            <a href="{% url 'manager:public_books' %}" class="btn btn-primary btn-lg">
                 <i class="fas fa-book"></i> 去选购图书
             </a>
         </div>

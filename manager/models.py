@@ -113,12 +113,23 @@ PAYMENT_METHOD_CHOICES = [
 
 ORDER_STATUS_CHOICES = [
     ('pending', '待处理'),
+    ('payment_pending', '待付款'),
+    ('paid', '已付款'),
     ('confirmed', '已确认'),
     ('processing', '处理中'),
     ('shipped', '已发货'),
     ('delivered', '已送达'),
     ('cancelled', '已取消'),
     ('refunded', '已退款'),
+]
+
+PAYMENT_STATUS_CHOICES = [
+    ('pending', '待支付'),
+    ('processing', '支付处理中'),
+    ('completed', '支付完成'),
+    ('failed', '支付失败'),
+    ('refunded', '已退款'),
+    ('cancelled', '已取消'),
 ]
 
 
@@ -136,8 +147,7 @@ class Order(models.Model):
     shipping_state = models.CharField(max_length=50, blank=True, verbose_name="省份")
     shipping_country = models.CharField(max_length=50, default='中国', verbose_name="国家")
     shipping_postal_code = models.CharField(max_length=20, blank=True, verbose_name="邮政编码")
-    
-    # 订单详情
+      # 订单详情
     payment_method = models.CharField(
         max_length=20, 
         choices=PAYMENT_METHOD_CHOICES, 
@@ -150,9 +160,29 @@ class Order(models.Model):
         default='pending', 
         verbose_name="订单状态"
     )
-    customer_notes = models.TextField(blank=True, verbose_name="客户备注")
     
-    # 时间戳
+    # 支付信息
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='pending',
+        verbose_name="支付状态"
+    )
+    payment_transaction_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="支付交易号"
+    )
+    payment_completed_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name="支付完成时间"
+    )
+    
+    customer_notes = models.TextField(blank=True, verbose_name="客户备注")
+    admin_notes = models.TextField(blank=True, verbose_name="管理员备注")
+      # 时间戳
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
     
@@ -176,6 +206,42 @@ class Order(models.Model):
     def get_total_items(self):
         """Get total number of items in this order"""
         return sum(item.quantity for item in self.orderitem_set.all())
+    
+    def mark_as_paid(self, transaction_id=None):
+        """Mark order as paid and update payment status"""
+        self.payment_status = 'completed'
+        self.status = 'paid'
+        self.payment_completed_at = timezone.now()
+        if transaction_id:
+            self.payment_transaction_id = transaction_id
+        self.save()
+    
+    def get_status_color(self):
+        """Get bootstrap color class for order status"""
+        status_colors = {
+            'pending': 'warning',
+            'payment_pending': 'info',
+            'paid': 'success',
+            'confirmed': 'primary',
+            'processing': 'info',
+            'shipped': 'primary',
+            'delivered': 'success',
+            'cancelled': 'danger',
+            'refunded': 'secondary',
+        }
+        return status_colors.get(self.status, 'secondary')
+    
+    def get_payment_status_color(self):
+        """Get bootstrap color class for payment status"""
+        payment_colors = {
+            'pending': 'warning',
+            'processing': 'info',
+            'completed': 'success',
+            'failed': 'danger',
+            'refunded': 'secondary',
+            'cancelled': 'dark',
+        }
+        return payment_colors.get(self.payment_status, 'secondary')
     
     def __str__(self):
         return f"订单 {self.order_number} - {self.customer_name}"
@@ -223,6 +289,42 @@ class CartItem(models.Model):
     
     def __str__(self):
         return f"{self.book.name} x {self.quantity}"
+
+# 订单通知模型（用于跟踪支付状态变化）
+class OrderNotification(models.Model):
+    """Order notification model for tracking payment status changes"""
+    NOTIFICATION_TYPES = [
+        ('payment_status_change', '支付状态变更'),
+        ('order_status_change', '订单状态变更'),
+        ('order_created', '订单创建'),
+        ('order_cancelled', '订单取消'),
+        ('refund_processed', '退款处理'),
+    ]
+    
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name="订单", related_name="notifications")
+    notification_type = models.CharField(
+        max_length=50, 
+        choices=NOTIFICATION_TYPES, 
+        verbose_name="通知类型"
+    )
+    message = models.TextField(verbose_name="通知消息")
+    details = models.JSONField(blank=True, null=True, verbose_name="详细信息")
+    is_read = models.BooleanField(default=False, verbose_name="是否已读")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    
+    class Meta:
+        db_table = "order_notification"
+        ordering = ['-created_at']
+        verbose_name = "订单通知"
+        verbose_name_plural = "订单通知"
+    
+    def mark_as_read(self):
+        """Mark notification as read"""
+        self.is_read = True
+        self.save()
+    
+    def __str__(self):
+        return f"{self.order.order_number} - {self.get_notification_type_display()}"
 
 # 创建(同步)数据表命令
 # 创建数据库db_book

@@ -22,6 +22,9 @@ ipython>=8.0.0
 # Data migration tools
 PyMySQL>=1.0.2
 
+# Excel export functionality
+openpyxl>=3.1.0
+
 # Installation instructions:
 # 1. Activate your conda environment: conda activate book_project
 # 2. Remove MySQL packages: pip uninstall mysqlclient PyMySQL -y
