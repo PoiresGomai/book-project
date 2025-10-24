@@ -1,0 +1,565 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}结账 - 图书管理系统{% endblock %}
+
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .step-indicator {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+    
+    .step {
+        display: flex;
+        align-items: center;
+        margin: 0 15px;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #6c757d;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    
+    .step.active .step-number {
+        background: #007bff;
+    }
+    
+    .step.completed .step-number {
+        background: #28a745;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .payment-methods {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .payment-option {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-option:hover {
+        border-color: #007bff;
+        background: #f8f9fa;
+    }
+    
+    .payment-option.selected {
+        border-color: #007bff;
+        background: #e3f2fd;
+    }
+    
+    .payment-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #6c757d;
+    }
+    
+    .payment-option.selected .payment-icon {
+        color: #007bff;
+    }
+    
+    .order-summary {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        position: sticky;
+        top: 20px;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .summary-item:last-child {
+        border-bottom: none;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .book-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .book-info {
+        flex: 1;
+        margin-left: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 12px 15px;
+    }
+    
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+    
+    .btn-checkout {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 8px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-checkout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+    }
+</style>
+
+<div class="checkout-container">
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step completed">
+            <div class="step-number">1</div>
+            <span>选择商品</span>
+        </div>
+        <div class="step active">
+            <div class="step-number">2</div>
+            <span>填写信息</span>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <span>完成订单</span>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'manager:checkout' %}" id="checkoutForm">
+        {% csrf_token %}
+        <div class="row">
+            <!-- Left Column - Forms -->
+            <div class="col-lg-8">
+                <!-- Customer Information -->
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-user"></i> 客户信息 (Digital Product)</h4>
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-info-circle"></i> 我们销售的是数字产品，无需填写收货地址
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">姓名 *</label>
+                                <input type="text" name="customer_name" class="form-control" required 
+                                       placeholder="请输入您的姓名">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">邮箱 *</label>
+                                <input type="email" name="customer_email" class="form-control" required
+                                       placeholder="用于接收订单和电子书">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">微信/电话号码 *</label>
+                                <input type="tel" name="customer_phone" class="form-control" required
+                                       placeholder="微信号或电话号码">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">国家 *</label>
+                                <select name="country" class="form-control" required>
+                                    <option value="">请选择国家 / Select Country</option>
+                                    
+                                    <!-- West Africa Countries -->
+                                    <optgroup label="West Africa / 西非">
+                                        <option value="Benin">Benin / 贝宁</option>
+                                        <option value="Burkina Faso">Burkina Faso / 布基纳法索</option>
+                                        <option value="Cape Verde">Cape Verde / 佛得角</option>
+                                        <option value="Côte d'Ivoire">Côte d'Ivoire / 科特迪瓦</option>
+                                        <option value="Gambia">Gambia / 冈比亚</option>
+                                        <option value="Ghana">Ghana / 加纳</option>
+                                        <option value="Guinea">Guinea / 几内亚</option>
+                                        <option value="Guinea-Bissau">Guinea-Bissau / 几内亚比绍</option>
+                                        <option value="Liberia">Liberia / 利比里亚</option>
+                                        <option value="Mali">Mali / 马里</option>
+                                        <option value="Mauritania">Mauritania / 毛里塔尼亚</option>
+                                        <option value="Niger">Niger / 尼日尔</option>
+                                        <option value="Nigeria">Nigeria / 尼日利亚</option>
+                                        <option value="Senegal">Senegal / 塞内加尔</option>
+                                        <option value="Sierra Leone">Sierra Leone / 塞拉利昂</option>
+                                        <option value="Togo">Togo / 多哥</option>
+                                    </optgroup>
+                                    
+                                    <!-- Central Africa Countries -->
+                                    <optgroup label="Central Africa / 中非">
+                                        <option value="Angola">Angola / 安哥拉</option>
+                                        <option value="Cameroon">Cameroon / 喀麦隆</option>
+                                        <option value="Central African Republic">Central African Republic / 中非共和国</option>
+                                        <option value="Chad">Chad / 乍得</option>
+                                        <option value="Congo">Congo / 刚果</option>
+                                        <option value="Democratic Republic of the Congo">Democratic Republic of the Congo / 刚果民主共和国</option>
+                                        <option value="Equatorial Guinea">Equatorial Guinea / 赤道几内亚</option>
+                                        <option value="Gabon">Gabon / 加蓬</option>
+                                        <option value="São Tomé and Príncipe">São Tomé and Príncipe / 圣多美和普林西比</option>
+                                    </optgroup>
+                                    
+                                    <!-- Asia -->
+                                    <optgroup label="Asia / 亚洲">
+                                        <option value="China">China / 中国</option>
+                                        <option value="Hong Kong">Hong Kong / 香港</option>
+                                        <option value="Japan">Japan / 日本</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-credit-card"></i> 支付方式</h4>
+                    <input type="hidden" name="payment_method" id="selectedPaymentMethod" required>
+                    <input type="hidden" name="payment_confirmed" id="paymentConfirmed" value="no">
+                    
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle"></i> 固定价格：<strong>¥{{ fixed_price }}</strong> / 本
+                    </div>
+                    
+                    <div class="payment-methods" id="paymentMethodsContainer">
+                        <!-- Payment methods will be dynamically loaded based on country -->
+                        <p class="text-muted text-center">请先选择国家以显示可用的支付方式</p>
+                    </div>
+                </div>
+
+                <!-- Customer Notes -->
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-comment"></i> 备注信息</h4>
+                    <div class="form-group">
+                        <label class="form-label">订单备注</label>
+                        <textarea name="customer_notes" class="form-control" rows="3" 
+                                  placeholder="如有特殊要求，请在此说明（可选）"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary -->
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h4 class="mb-3"><i class="fas fa-receipt"></i> 订单摘要</h4>
+                    
+                    <!-- Cart Items -->
+                    <div class="cart-items mb-3">
+                        {% for item in cart_items %}
+                        <div class="book-item">
+                            <div class="book-cover">
+                                {% if item.book.cover_image %}
+                                    <img src="{{ item.book.cover_image.url }}" alt="{{ item.book.name }}" 
+                                         style="width: 60px; height: 80px; object-fit: cover; border-radius: 5px;">
+                                {% else %}
+                                    <div style="width: 60px; height: 80px; background: #f8f9fa; border-radius: 5px; 
+                                                display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-book text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="book-info">
+                                <h6 class="mb-1">{{ item.book.name }}</h6>
+                                <p class="text-muted mb-1">{{ item.book.publisher.publisher_name }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <span>¥{{ item.book.price }} × {{ item.quantity }}</span>
+                                    <strong>¥{{ item.get_total_price }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Summary -->
+                    <div class="summary-details">
+                        <div class="summary-item">
+                            <span>商品总计:</span>
+                            <span>¥{{ total_amount }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>运费:</span>
+                            <span class="text-success">免费</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>订单总额:</span>
+                            <span class="text-primary">¥{{ total_amount }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Checkout Button -->
+                    <button type="submit" class="btn btn-success btn-checkout mt-3">
+                        <i class="fas fa-lock"></i> 确认订单并支付
+                    </button>
+                    
+                    <!-- Security Notice -->
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt"></i> 
+                            您的支付信息经过安全加密保护
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// African countries list
+const africanCountries = [
+    'Benin', 'Burkina Faso', 'Cape Verde', 'Côte d\'Ivoire', 'Gambia', 'Ghana', 'Guinea', 
+    'Guinea-Bissau', 'Liberia', 'Mali', 'Mauritania', 'Niger', 'Nigeria', 'Senegal', 
+    'Sierra Leone', 'Togo', 'Angola', 'Cameroon', 'Central African Republic', 'Chad', 
+    'Congo', 'Democratic Republic of the Congo', 'Equatorial Guinea', 'Gabon', 'São Tomé and Príncipe'
+];
+
+// Payment methods by region
+const paymentMethodsByRegion = {
+    africa: [
+        { method: 'mtn_money', name: 'MTN Money', icon: 'fas fa-mobile-alt', color: '#ffcb05' },
+        { method: 'orange_money', name: 'Orange Money', icon: 'fas fa-mobile-alt', color: '#ff7900' },
+        { method: 'airtel_money', name: 'Airtel Money', icon: 'fas fa-mobile-alt', color: '#ed1c24' }
+    ],
+    china: [
+        { method: 'wechat_pay', name: '微信支付', icon: 'fab fa-weixin', color: '#07c160' },
+        { method: 'alipay', name: '支付宝', icon: 'fab fa-alipay', color: '#1677ff' }
+    ],
+    others: [
+        { method: 'paypal', name: 'PayPal', icon: 'fab fa-paypal', color: '#0070ba' },
+        { method: 'credit_card', name: '信用卡', icon: 'fas fa-credit-card', color: '#6c757d' },
+        { method: 'bank_transfer', name: '银行转账', icon: 'fas fa-university', color: '#28a745' }
+    ]
+};
+
+// Update payment methods based on country
+function updatePaymentMethods(country) {
+    const container = document.getElementById('paymentMethodsContainer');
+    let methods = [];
+    
+    if (!country) {
+        container.innerHTML = '<p class="text-muted text-center">请先选择国家以显示可用的支付方式</p>';
+        return;
+    }
+    
+    // Determine which payment methods to show
+    if (africanCountries.includes(country)) {
+        methods = paymentMethodsByRegion.africa;
+    } else if (country === 'China' || country === 'Hong Kong') {
+        methods = paymentMethodsByRegion.china;
+    } else {
+        methods = paymentMethodsByRegion.others;
+    }
+    
+    // Generate HTML for payment options
+    let html = '<div class="row g-3">';
+    methods.forEach(pm => {
+        html += `
+            <div class="col-md-6">
+                <div class="payment-option" data-method="${pm.method}">
+                    <div class="payment-icon">
+                        <i class="${pm.icon}" style="color: ${pm.color};"></i>
+                    </div>
+                    <div class="payment-name">${pm.name}</div>
+                    <small class="text-muted">点击选择</small>
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+    
+    container.innerHTML = html;
+    
+    // Re-attach event listeners
+    attachPaymentOptionListeners();
+}
+
+// Attach event listeners to payment options
+function attachPaymentOptionListeners() {
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove selected class from all
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            this.classList.add('selected');
+            
+            // Update hidden field
+            const selectedMethod = this.dataset.method;
+            document.getElementById('selectedPaymentMethod').value = selectedMethod;
+        });
+    });
+}
+
+// Listen to country selection changes
+document.querySelector('[name="country"]').addEventListener('change', function() {
+    const selectedCountry = this.value;
+    updatePaymentMethods(selectedCountry);
+    
+    // Clear previously selected payment method
+    document.getElementById('selectedPaymentMethod').value = '';
+});
+
+// Form validation and QR code modal for Chinese payments
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const paymentMethod = document.getElementById('selectedPaymentMethod').value;
+    if (!paymentMethod) {
+        alert('请选择支付方式');
+        return false;
+    }
+    
+    // If payment method is WeChat or Alipay, show QR code modal
+    if (paymentMethod === 'wechat_pay' || paymentMethod === 'alipay') {
+        showQRCodeModal(paymentMethod);
+    } else {
+        // For other payment methods, submit form directly with pending status
+        document.getElementById('paymentConfirmed').value = 'no';
+        this.submit();
+    }
+});
+
+// Show QR Code Modal
+function showQRCodeModal(method) {
+    const modal = document.getElementById('qrCodeModal');
+    const qrImage = document.getElementById('qrCodeImage');
+    const paymentTitle = document.getElementById('paymentMethodTitle');
+    const timerElement = document.getElementById('qrTimer');
+    const confirmButtons = document.getElementById('confirmButtons');
+    
+    // Set QR code image and title
+    if (method === 'wechat_pay') {
+        qrImage.src = '{% static "payment_qr/wechat_qr.jpg" %}';
+        paymentTitle.textContent = '微信支付';
+    } else if (method === 'alipay') {
+        qrImage.src = '{% static "payment_qr/alipay_qr.jpg" %}';
+        paymentTitle.textContent = '支付宝';
+    }
+    
+    // Show modal
+    modal.style.display = 'block';
+    
+    // Hide confirm buttons initially
+    confirmButtons.style.display = 'none';
+    
+    // Start 60 second timer
+    let timeLeft = 60;
+    timerElement.textContent = `${timeLeft}秒后显示确认按钮...`;
+    
+    const timer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+            timerElement.textContent = `${timeLeft}秒后显示确认按钮...`;
+        } else {
+            clearInterval(timer);
+            timerElement.style.display = 'none';
+            confirmButtons.style.display = 'block';
+        }
+    }, 1000);
+}
+
+// Handle "Already Paid" button
+function handleAlreadyPaid() {
+    document.getElementById('paymentConfirmed').value = 'yes';
+    document.getElementById('checkoutForm').submit();
+}
+
+// Handle "Not Paid Yet" button
+function handleNotPaid() {
+    document.getElementById('paymentConfirmed').value = 'no';
+    document.getElementById('checkoutForm').submit();
+}
+
+// Close modal
+function closeQRModal() {
+    document.getElementById('qrCodeModal').style.display = 'none';
+}
+</script>
+
+<!-- QR Code Payment Modal -->
+<div id="qrCodeModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); overflow-y: auto;">
+    <div style="position: relative; margin: 3% auto; padding: 20px; background-color: white; width: 90%; max-width: 550px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        <button onclick="closeQRModal()" style="position: absolute; right: 15px; top: 15px; border: none; background: transparent; font-size: 24px; cursor: pointer; color: #999;">&times;</button>
+        
+        <div style="text-align: center;">
+            <h3 id="paymentMethodTitle" style="margin-bottom: 15px; color: #333; font-size: 24px;">微信支付</h3>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                <img id="qrCodeImage" src="" alt="Payment QR Code" style="width: 100%; max-width: 380px; height: auto; border-radius: 10px;">
+            </div>
+            
+            <p style="color: #666; margin-bottom: 15px;">
+                <i class="fas fa-mobile-alt"></i> 请使用手机扫描二维码完成支付<br>
+                <strong style="color: #e74c3c;">金额：¥{{ total_amount }}</strong>
+            </p>
+            
+            <div id="qrTimer" style="color: #007bff; font-weight: bold; margin-bottom: 20px;">
+                60秒后显示确认按钮...
+            </div>
+            
+            <div id="confirmButtons" style="display: none;">
+                <p style="margin-bottom: 15px; color: #333;">请确认您的支付状态：</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="handleAlreadyPaid()" style="flex: 1; background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
+                        <i class="fas fa-check-circle"></i> 已完成支付
+                    </button>
+                    <button onclick="handleNotPaid()" style="flex: 1; background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
+                        <i class="fas fa-times-circle"></i> 尚未支付
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

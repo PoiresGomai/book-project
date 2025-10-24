@@ -1,0 +1,719 @@
+{% extends 'public/base.html' %}
+
+{% block title %}订单跟踪 - 图书管理系统{% endblock %}
+
+{% block content %}
+<style>
+    .track-container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 0 20px;
+    }
+    
+    .track-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 40px 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+    }
+    
+    .track-form {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .order-input {
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        padding: 15px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .order-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .track-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 15px 30px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .track-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .order-result {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .order-status {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-confirmed {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-shipped {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-delivered {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+    
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .payment-completed {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+    
+    .payment-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .payment-failed {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 30px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e1e5e9;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding: 15px 0 15px 70px;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 24px;
+        top: 20px;
+        width: 12px;
+        height: 12px;
+        background: #e1e5e9;
+        border-radius: 50%;
+    }
+    
+    .timeline-item.active::before {
+        background: #28a745;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+    }
+    
+    .timeline-icon {
+        position: absolute;
+        left: 16px;
+        top: 15px;
+        width: 28px;
+        height: 28px;
+        background: #f8f9fa;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .timeline-item.active .timeline-icon {
+        background: #28a745;
+        color: white;
+    }
+    
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    
+    .info-value {
+        font-size: 16px;
+        color: #212529;
+    }
+    
+    .no-order-found {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+    
+    .no-order-found i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #dee2e6;
+    }
+</style>
+
+<div class="track-container">
+    <!-- Header -->
+    <div class="track-header">
+        <h1 class="mb-3">
+            <i class="fas fa-search me-3"></i>订单跟踪
+        </h1>
+        <p class="mb-0">输入您的订单号或邮箱来查看订单状态和物流信息</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="track-form">
+        <ul class="nav nav-tabs mb-4" id="searchTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="order-tab" data-bs-toggle="tab" data-bs-target="#order-search" type="button" role="tab">
+                    <i class="fas fa-hashtag"></i> 订单号查询
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-search" type="button" role="tab">
+                    <i class="fas fa-envelope"></i> 邮箱查询
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="searchTabsContent">
+            <!-- Order Number Search -->
+            <div class="tab-pane fade show active" id="order-search" role="tabpanel">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="search_type" value="order_number">
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label for="order_number" class="form-label">订单号</label>
+                            <input type="text" 
+                                   class="form-control order-input" 
+                                   id="order_number" 
+                                   name="order_number" 
+                                   placeholder="请输入您的订单号，例如：ORD20250128120000ABCD1234"
+                                   required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn track-btn w-100">
+                                <i class="fas fa-search me-2"></i>查询订单
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Email Search -->
+            <div class="tab-pane fade" id="email-search" role="tabpanel">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="search_type" value="email">
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label for="customer_email" class="form-label">客户邮箱</label>
+                            <input type="email" 
+                                   class="form-control order-input" 
+                                   id="customer_email" 
+                                   name="customer_email" 
+                                   placeholder="请输入您的邮箱地址"
+                                   required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn track-btn w-100">
+                                <i class="fas fa-search me-2"></i>查询订单
+                            </button>
+                        </div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        <i class="fas fa-info-circle"></i> 将显示与此邮箱相关的所有订单
+                    </small>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Multiple Orders Result (Email Search) -->
+    {% if orders %}
+    <div class="order-result">
+        <h4 class="mb-4">
+            <i class="fas fa-list"></i> 找到 {{ orders|length }} 个订单
+        </h4>
+        {% for order in orders %}
+        <div class="card mb-3" style="border-left: 4px solid #667eea;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="mb-1">
+                            <i class="fas fa-receipt"></i> {{ order.order_number }}
+                        </h5>
+                        <small class="text-muted">
+                            {{ order.created_at|date:"Y年m月d日 H:i" }}
+                        </small>
+                    </div>
+                    <div>
+                        <span class="order-status {% if order.status == 'pending' or order.status == 'payment_pending' %}status-pending{% elif order.status == 'processing' %}status-confirmed{% elif order.status == 'shipped' %}status-shipped{% elif order.status == 'delivered' %}status-delivered{% else %}status-cancelled{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <small class="text-muted">订单金额</small>
+                        <p class="mb-0 fw-bold text-success">¥{{ order.total_amount }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">支付方式</small>
+                        <p class="mb-0">{{ order.get_payment_method_display }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted">支付状态</small>
+                        <p class="mb-0">
+                            <span class="badge {% if order.payment_status == 'completed' %}bg-success{% elif order.payment_status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ order.get_payment_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'manager:order_confirmation' order.order_number %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-eye"></i> 查看详情
+                    </a>
+                    {% if order.status == 'payment_pending' %}
+                    <button onclick="quickPayment('{{ order.order_number }}')" class="btn btn-sm btn-success">
+                        <i class="fas fa-credit-card"></i> 立即支付
+                    </button>
+                    <button onclick="quickCancel('{{ order.order_number }}')" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-times"></i> 取消订单
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif order %}
+    <div class="order-result">
+        <!-- Order Basic Info -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">订单 #{{ order.order_number }}</h3>
+            <div>
+                <span class="order-status status-{{ order.status }}">
+                    {{ order.get_status_display }}
+                </span>
+                <span class="order-status payment-{{ order.payment_status }} ms-2">
+                    {{ order.get_payment_status_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Order Information Grid -->
+        <div class="order-info">
+            <div class="info-card">
+                <div class="info-label">客户姓名</div>
+                <div class="info-value">{{ order.customer_name }}</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">联系电话</div>
+                <div class="info-value">{{ order.customer_phone }}</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">订单金额</div>
+                <div class="info-value">¥{{ order.total_amount }}</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">下单时间</div>
+                <div class="info-value">{{ order.created_at|date:"Y-m-d H:i" }}</div>
+            </div>
+            {% if order.country %}
+            <div class="info-card">
+                <div class="info-label">国家</div>
+                <div class="info-value">{{ order.country }}</div>
+            </div>
+            {% endif %}
+            {% if order.payment_method %}
+            <div class="info-card">
+                <div class="info-label">支付方式</div>
+                <div class="info-value">{{ order.get_payment_method_display }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Order Timeline -->
+        <h5 class="mb-3"><i class="fas fa-clock me-2"></i>订单进度</h5>
+        <div class="timeline">
+            <!-- Order Placed -->
+            <div class="timeline-item active">
+                <div class="timeline-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div>
+                    <strong>订单已创建</strong>
+                    <p class="text-muted mb-0">{{ order.created_at|date:"m月d日 H:i" }}</p>
+                </div>
+            </div>
+
+            <!-- Payment Status -->
+            {% if order.payment_status == 'completed' %}
+            <div class="timeline-item active">
+                <div class="timeline-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div>
+                    <strong>支付完成</strong>
+                    <p class="text-muted mb-0">
+                        {% if order.payment_completed_at %}
+                            {{ order.payment_completed_at|date:"m月d日 H:i" }}
+                        {% else %}
+                            {{ order.updated_at|date:"m月d日 H:i" }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% else %}
+            <div class="timeline-item">
+                <div class="timeline-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div>
+                    <strong>等待支付</strong>
+                    <p class="text-muted mb-0">请尽快完成支付</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Order Confirmed -->
+            {% if order.status == 'confirmed' or order.status == 'shipped' or order.status == 'delivered' %}
+            <div class="timeline-item active">
+                <div class="timeline-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div>
+                    <strong>订单已确认</strong>
+                    <p class="text-muted mb-0">商家已确认您的订单</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="timeline-item">
+                <div class="timeline-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div>
+                    <strong>等待确认</strong>
+                    <p class="text-muted mb-0">商家正在处理您的订单</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Order Shipped -->
+            {% if order.status == 'shipped' or order.status == 'delivered' %}
+            <div class="timeline-item active">
+                <div class="timeline-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div>
+                    <strong>订单已发货</strong>
+                    <p class="text-muted mb-0">您的订单正在配送中</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="timeline-item">
+                <div class="timeline-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div>
+                    <strong>等待发货</strong>
+                    <p class="text-muted mb-0">商品准备中</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Order Delivered -->
+            {% if order.status == 'delivered' %}
+            <div class="timeline-item active">
+                <div class="timeline-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div>
+                    <strong>订单已送达</strong>
+                    <p class="text-muted mb-0">{{ order.updated_at|date:"m月d日 H:i" }}</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="timeline-item">
+                <div class="timeline-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div>
+                    <strong>等待签收</strong>
+                    <p class="text-muted mb-0">商品将尽快送达</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Cancelled Order -->
+            {% if order.status == 'cancelled' %}
+            <div class="timeline-item active">
+                <div class="timeline-icon">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div>
+                    <strong>订单已取消</strong>
+                    <p class="text-muted mb-0">{{ order.updated_at|date:"m月d日 H:i" }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Order Items -->
+        {% if order.orderitem_set.all %}
+        <h5 class="mb-3 mt-4"><i class="fas fa-box me-2"></i>商品清单</h5>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>商品名称</th>
+                        <th>数量</th>
+                        <th>单价</th>
+                        <th>小计</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.orderitem_set.all %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if item.book.cover_image %}
+                                <img src="{{ item.book.cover_image.url }}" 
+                                     alt="{{ item.book.name }}" 
+                                     style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px; margin-right: 10px;">
+                                {% endif %}
+                                <div>
+                                    <strong>{{ item.book.name }}</strong>
+                                    {% if item.book.author_set.all %}
+                                    <br><small class="text-muted">
+                                        作者：{% for author in item.book.author_set.all %}{{ author.name }}{% if not forloop.last %}、{% endif %}{% endfor %}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>¥{{ item.price }}</td>
+                        <td><strong>¥{{ item.get_total_price }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" class="text-end">总计：</th>
+                        <th>¥{{ order.total_amount }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Download Section (Only for Shipped Orders) -->
+        {% if order.status == 'shipped' or order.status == 'delivered' %}
+        <div class="mt-4">
+            <h5 class="mb-3"><i class="fas fa-download me-2"></i>图书下载</h5>
+            {% for item in order.orderitem_set.all %}
+                {% if item.book.has_download %}
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                {% if item.book.cover_image %}
+                                <img src="{{ item.book.cover_image.url }}" 
+                                     alt="{{ item.book.name }}" 
+                                     class="img-fluid rounded"
+                                     style="max-height: 100px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="height: 100px;">
+                                    <i class="fas fa-book fa-3x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-7">
+                                <h6 class="mb-1">{{ item.book.name }}</h6>
+                                {% if item.book.author_set.all %}
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-user me-1"></i>
+                                    {% for author in item.book.author_set.all %}
+                                        {{ author.name }}{% if not forloop.last %}、{% endif %}
+                                    {% endfor %}
+                                </p>
+                                {% endif %}
+                                <small class="text-muted">
+                                    {% if item.book.get_download_type == 'file' %}
+                                        <i class="fas fa-file-pdf me-1"></i>文件下载
+                                    {% else %}
+                                        <i class="fas fa-cloud me-1"></i>外部链接
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <a href="{% url 'manager:download_book' order.id item.book.id %}" 
+                                   class="btn btn-primary"
+                                   {% if item.book.get_download_type == 'link' %}target="_blank"{% endif %}>
+                                    <i class="fas fa-download me-1"></i>下载图书
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% if not order.orderitem_set.all|selectattr:"book.has_download" %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                您购买的图书暂无电子版下载，如需纸质版请等待配送。
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Contact Info -->
+        <div class="mt-4 p-3 bg-light rounded">
+            <h6><i class="fas fa-phone me-2"></i>需要帮助？</h6>
+            <p class="mb-0">如果您对订单有任何疑问，请联系我们的客服：</p>
+            <p class="mb-0">电话：400-123-4567 | 邮箱：service@bookstore.com</p>
+        </div>
+    </div>
+    
+    {% elif request.method == 'POST' %}
+    <!-- No Order Found -->
+    <div class="order-result">
+        <div class="no-order-found">
+            <i class="fas fa-search"></i>
+            <h5>未找到订单</h5>
+            <p>请检查您输入的订单号是否正确，或联系客服获取帮助。</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto-focus on order input
+document.addEventListener('DOMContentLoaded', function() {
+    const orderInput = document.getElementById('order_number');
+    if (orderInput) {
+        orderInput.focus();
+    }
+});
+
+// Format order number input
+const orderNumberInput = document.getElementById('order_number');
+if (orderNumberInput) {
+    orderNumberInput.addEventListener('input', function(e) {
+        let value = e.target.value.toUpperCase();
+        e.target.value = value;
+    });
+}
+
+// Quick payment function
+function quickPayment(orderNumber) {
+    window.location.href = `/manager/order-confirmation/${orderNumber}/`;
+}
+
+// Quick cancel function
+function quickCancel(orderNumber) {
+    if (confirm('确定要取消此订单吗？')) {
+        fetch('/manager/api/cancel-order/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                order_number: orderNumber
+            })
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('订单已取消');
+                location.reload();
+            }
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

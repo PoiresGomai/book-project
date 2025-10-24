@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}图书管理系统{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+            --footer-bg: #1a1a2e;
+            --footer-secondary: #16213e;
+            --footer-accent: #0f3460;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 0;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            margin-bottom: 30px;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .stats-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-modern {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .btn-modern {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary-modern {
+            background: linear-gradient(45deg, var(--secondary-color), #5dade2);
+            color: white;
+        }
+        
+        .btn-primary-modern:hover {
+            background: linear-gradient(45deg, #2980b9, var(--secondary-color));
+            transform: translateY(-2px);
+        }
+        
+        .search-section {
+            background: var(--light-bg);
+            padding: 40px 0;
+            margin: 40px 0;
+        }
+        
+        .search-box {
+            border-radius: 25px;
+            border: 2px solid #e0e0e0;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-box:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, var(--footer-bg) 0%, var(--footer-secondary) 50%, var(--footer-accent) 100%);
+            color: #ffffff;
+            padding: 60px 0 20px 0;
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color), var(--success-color), var(--warning-color));
+        }
+        
+        .footer-section {
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .footer-section.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .footer-logo i {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-right: 15px;
+        }
+        
+        .footer-logo h4 {
+            margin: 0;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 1.5rem;
+        }
+        
+        .footer-description {
+            color: #b8c6db;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .social-link:hover {
+            background: var(--secondary-color);
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+        
+        .social-link i {
+            font-size: 1.2rem;
+        }
+        
+        .footer-title {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #b8c6db;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary-color);
+            padding-left: 8px;
+        }
+        
+        .footer-links a i {
+            font-size: 0.8rem;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        
+        .contact-info {
+            margin-bottom: 25px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .contact-item i {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-right: 15px;
+            margin-top: 2px;
+            min-width: 20px;
+        }
+        
+        .contact-details strong {
+            display: block;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .contact-details span {
+            color: #b8c6db;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .admin-access {
+            margin-top: 25px;
+        }
+        
+        .admin-access .btn {
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+            padding: 10px 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-access .btn:hover {
+            background: var(--secondary-color);
+            color: #ffffff;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .footer-divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            margin: 40px 0 30px 0;
+        }
+        
+        .footer-bottom {
+            padding-top: 20px;
+        }
+        
+        .copyright p {
+            color: #8892b0;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .legal-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .legal-links a {
+            color: #b8c6db;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+        
+        .legal-links a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .legal-links span {
+            color: #6c7b8a;
+            font-size: 0.8rem;
+        }
+        
+        .footer-tech {
+            text-align: right;
+        }
+        
+        .footer-tech p {
+            color: #8892b0;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .footer-tech i {
+            color: var(--warning-color);
+            font-size: 1.1rem;
+        }
+        
+        .footer-tech strong {
+            color: var(--secondary-color);
+        }
+        
+        .version-info {
+            margin: 0;
+        }
+        
+        .version-info small {
+            color: #6c7b8a;
+            font-size: 0.8rem;
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .back-to-top i {
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .footer {
+                padding: 40px 0 20px 0;
+                margin-top: 40px;
+            }
+            
+            .footer-logo {
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .footer-tech {
+                text-align: center;
+                margin-top: 20px;
+            }
+            
+            .footer-tech p {
+                justify-content: center;
+            }
+            
+            .legal-links {
+                justify-content: center;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .contact-item {
+                padding: 10px;
+            }
+            
+            .footer-section {
+                text-align: center;
+            }
+            
+            .footer-title::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .footer-logo h4 {
+                font-size: 1.3rem;
+            }
+            
+            .footer-description {
+                font-size: 0.9rem;
+            }
+            
+            .contact-details {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'manager:public_home' %}" style="font-weight: 700; font-size: 1.4rem;">
+                <i class="fas fa-book-open" style="margin-right: 10px; font-size: 1.5rem; color: #fff;"></i>
+                <span style="background: linear-gradient(90deg, #fff, #e0f2ff); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent;" data-zh="图书管理系统" data-en="Book Management System">图书管理系统</span>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="padding: 8px 12px;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto ms-lg-4">
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2" href="{% url 'manager:public_home' %}" style="font-weight: 500; transition: all 0.3s ease; border-radius: 8px;">
+                            <i class="fas fa-home me-1"></i> <span data-zh="首页" data-en="Home">首页</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2" href="{% url 'manager:public_books' %}" style="font-weight: 500; transition: all 0.3s ease; border-radius: 8px;">
+                            <i class="fas fa-book me-1"></i> <span data-zh="图书目录" data-en="Books">图书目录</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2" href="{% url 'manager:public_authors' %}" style="font-weight: 500; transition: all 0.3s ease; border-radius: 8px;">
+                            <i class="fas fa-user-edit me-1"></i> <span data-zh="作者" data-en="Authors">作者</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2" href="{% url 'manager:public_publishers' %}" style="font-weight: 500; transition: all 0.3s ease; border-radius: 8px;">
+                            <i class="fas fa-building me-1"></i> <span data-zh="出版社" data-en="Publishers">出版社</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 py-2" href="{% url 'manager:track_order' %}" style="font-weight: 500; transition: all 0.3s ease; border-radius: 8px;">
+                            <i class="fas fa-search-location me-1"></i> <span data-zh="跟踪订单" data-en="Track Order">跟踪订单</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Language Switcher -->
+                    <button id="languageSwitcher" onclick="toggleLanguage()" class="btn btn-sm d-flex align-items-center" style="background: rgba(255,255,255,0.15); color: #fff; padding: 8px 15px; border-radius: 25px; font-weight: 600; border: 2px solid rgba(255,255,255,0.3); transition: all 0.3s ease; backdrop-filter: blur(10px);">
+                        <i class="fas fa-globe me-2"></i> 
+                        <span id="langText">EN</span>
+                    </button>
+                    
+                    <a href="{% url 'manager:view_cart' %}" class="position-relative" style="text-decoration: none; transition: transform 0.3s ease;">
+                        <div class="d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(255,255,255,0.15); border-radius: 50%; backdrop-filter: blur(10px); transition: all 0.3s ease;">
+                            <i class="fas fa-shopping-cart" style="font-size: 1.2rem; color: #fff;"></i>
+                        </div>
+                        <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="font-size: 0.7rem; background: linear-gradient(135deg, #e74c3c, #c0392b); padding: 4px 7px; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);">
+                            0
+                        </span>
+                    </a>
+                    <a href="/manager/login/" class="btn btn-sm d-flex align-items-center" style="background: rgba(255,255,255,0.95); color: #4880ca; padding: 10px 20px; border-radius: 25px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <i class="fas fa-user-shield me-2"></i> <span data-zh="管理员登录" data-en="Admin Login">管理员登录</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <style>
+        /* Enhanced Navigation Hover Effects */
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15) !important;
+            transform: translateY(-2px);
+        }
+        
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        a[href*="view_cart"]:hover > div {
+            background: rgba(255, 255, 255, 0.25) !important;
+            transform: scale(1.1);
+        }
+        
+        a[href*="login"].btn:hover {
+            background: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+        }
+        
+        #languageSwitcher:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            transform: translateY(-2px);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 991px) {
+            .navbar-nav {
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 4px 0;
+            }
+            
+            .d-flex.align-items-center.gap-3 {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+        }
+    </style>
+    
+    <!-- Main Content -->
+    <main style="margin-top: 76px;">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <!-- Main Footer Content -->
+            <div class="row g-4">
+                <!-- Company Information -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-section">
+                        <div class="footer-logo">
+                            <i class="fas fa-book-reader"></i>
+                            <h4 data-zh="图书管理系统" data-en="Book Management System">图书管理系统</h4>
+                        </div>
+                        <p class="footer-description" data-zh="现代化的智能图书管理平台，为读者和管理员提供便捷、高效的图书查询、浏览和管理服务。致力于推广阅读文化，建设知识型社会。" data-en="A modern intelligent book management platform providing convenient and efficient book search, browsing and management services for readers and administrators. Dedicated to promoting reading culture and building a knowledge-based society.">
+                            现代化的智能图书管理平台，为读者和管理员提供便捷、高效的图书查询、浏览和管理服务。致力于推广阅读文化，建设知识型社会。
+                        </p>
+                        <div class="social-links">
+                            <a href="#" class="social-link" title="微博">
+                                <i class="fab fa-weibo"></i>
+                            </a>
+                            <a href="#" class="social-link" title="微信公众号">
+                                <i class="fab fa-weixin"></i>
+                            </a>
+                            <a href="#" class="social-link" title="GitHub">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="social-link" title="邮箱">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Navigation -->
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-section">
+                        <h5 class="footer-title" data-zh="快速导航" data-en="Quick Links">快速导航</h5>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'manager:public_home' %}"><i class="fas fa-chevron-right"></i><span data-zh="首页" data-en="Home">首页</span></a></li>
+                            <li><a href="{% url 'manager:public_books' %}"><i class="fas fa-chevron-right"></i><span data-zh="图书目录" data-en="Books">图书目录</span></a></li>
+                            <li><a href="{% url 'manager:public_authors' %}"><i class="fas fa-chevron-right"></i><span data-zh="作者列表" data-en="Authors">作者列表</span></a></li>
+                            <li><a href="{% url 'manager:public_publishers' %}"><i class="fas fa-chevron-right"></i><span data-zh="出版社" data-en="Publishers">出版社</span></a></li>
+                            <li><a href="{% url 'manager:track_order' %}"><i class="fas fa-chevron-right"></i><span data-zh="订单跟踪" data-en="Track Order">订单跟踪</span></a></li>
+
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Services -->
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-section">
+                        <h5 class="footer-title" data-zh="系统功能" data-en="Features">系统功能</h5>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'manager:public_books' %}"><i class="fas fa-chevron-right"></i><span data-zh="图书查询" data-en="Book Search">图书查询</span></a></li>
+                            <li><a href="{% url 'manager:view_cart' %}"><i class="fas fa-chevron-right"></i><span data-zh="购物车" data-en="Shopping Cart">购物车</span></a></li>
+                            <li><a href="{% url 'manager:track_order' %}"><i class="fas fa-chevron-right"></i><span data-zh="订单跟踪" data-en="Order Tracking">订单跟踪</span></a></li>
+                            <li><a href="/manager/login/"><i class="fas fa-chevron-right"></i><span data-zh="管理后台" data-en="Admin Panel">管理后台</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-section">
+                        <h5 class="footer-title" data-zh="联系我们" data-en="Contact Us">联系我们</h5>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="contact-details">
+                                    <strong data-zh="地址" data-en="Address">地址</strong>
+                                    <span data-zh="北京市海淀区中关村科技园区" data-en="Zhongguancun Science Park, Haidian District, Beijing">北京市海淀区中关村科技园区</span>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <div class="contact-details">
+                                    <strong data-zh="电话" data-en="Phone">电话</strong>
+                                    <span>+86 136 7130 9752</span>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div class="contact-details">
+                                    <strong data-zh="邮箱" data-en="Email">邮箱</strong>
+                                    <span> espoirmoukendi@gmail.com</span>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-clock"></i>
+                                <div class="contact-details">
+                                    <strong data-zh="服务时间" data-en="Service Hours">服务时间</strong>
+                                    <span data-zh="周一至周五 9:00-18:00" data-en="Monday - Friday 9:00-18:00">周一至周五 9:00-18:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Management Access -->
+                        <div class="admin-access">
+                            <a href="/manager/login/" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-user-shield"></i> <span data-zh="管理员入口" data-en="Admin Portal">管理员入口</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Bottom -->
+            <hr class="footer-divider">
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="copyright">
+                            <p>&copy; 2024 <span data-zh="图书管理系统" data-en="Book Management System">图书管理系统</span>. <span data-zh="保留所有权利" data-en="All rights reserved">保留所有权利</span>.</p>
+                            <div class="legal-links">
+                                <a href="#" data-zh="隐私政策" data-en="Privacy Policy">隐私政策</a>
+                                <span>|</span>
+                                <a href="#" data-zh="使用条款" data-en="Terms of Use">使用条款</a>
+                                <span>|</span>
+                                <a href="#" data-zh="网站地图" data-en="Sitemap">网站地图</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="footer-tech">
+                            <p class="mb-0">
+                                <i class="fab fa-python"></i> Powered by 
+                                <strong>Django</strong> & <strong>PostgreSQL</strong>
+                            </p>
+                            <p class="version-info">
+                                <small>Version 2.0 | <span data-zh="最后更新: 2024年12月" data-en="Last Updated: December 2024">最后更新: 2024年12月</span></small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Back to Top Button -->
+        <div class="back-to-top" id="backToTop">
+            <i class="fas fa-chevron-up"></i>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Back to top functionality
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Footer animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe footer sections
+        document.querySelectorAll('.footer-section').forEach(section => {
+            observer.observe(section);
+        });
+        
+        // Language Switcher System
+        let currentLanguage = localStorage.getItem('language') || 'zh';
+        
+        // Language translations for common elements
+        const translations = {
+            zh: {
+                // Navigation will use data attributes
+            },
+            en: {
+                // Navigation will use data attributes
+            }
+        };
+        
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('language', currentLanguage);
+            applyLanguage();
+        }
+        
+        function applyLanguage() {
+            // Update language button text
+            const langText = document.getElementById('langText');
+            if (langText) {
+                langText.textContent = currentLanguage === 'zh' ? 'EN' : '中文';
+            }
+            
+            // Update all elements with data-zh and data-en attributes
+            document.querySelectorAll('[data-zh][data-en]').forEach(element => {
+                element.textContent = element.getAttribute('data-' + currentLanguage);
+            });
+            
+            // Update HTML lang attribute
+            document.documentElement.lang = currentLanguage === 'zh' ? 'zh-Hans' : 'en';
+        }
+        
+        // Apply saved language on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            applyLanguage();
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

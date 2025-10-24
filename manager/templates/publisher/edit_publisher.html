@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑出版社 - {{ publisher_obj.publisher_name }} | 图书管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .header-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: none;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-modern {
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary-modern {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary-modern:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .sidebar-link {
+            display: block;
+            padding: 12px 16px;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .required {
+            color: var(--danger-color);
+        }
+        
+        .breadcrumb-modern {
+            background: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb-modern .breadcrumb-item a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-modern .breadcrumb-item.active {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="header-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <nav class="breadcrumb-modern">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/manager/publisher_list/"><i class="fas fa-home"></i> 首页</a></li>
+                                <li class="breadcrumb-item"><a href="/manager/publisher_list/">出版社管理</a></li>
+                                <li class="breadcrumb-item active">编辑出版社</li>
+                            </ol>
+                        </nav>
+                        <h2 class="mb-0"><i class="fas fa-edit"></i> 编辑出版社信息</h2>
+                        <p class="mb-0 mt-2 opacity-75">修改 "{{ publisher_obj.publisher_name }}" 的详细信息</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="mb-0">欢迎回来，<strong>{{ name }}</strong> 管理员</p>
+                        <small class="opacity-75">今天是 <span id="currentDate"></span></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3">
+                    <div class="sidebar">
+                        <h6 class="text-muted mb-3 fw-bold">快速导航</h6>
+                        <a href="/manager/publisher_list/" class="sidebar-link">
+                            <i class="fas fa-list"></i> 出版社列表
+                        </a>
+                        <a href="/manager/add_publisher/" class="sidebar-link">
+                            <i class="fas fa-plus"></i> 添加出版社
+                        </a>
+                        <a href="/manager/book_list/" class="sidebar-link">
+                            <i class="fas fa-book"></i> 图书管理
+                        </a>
+                        <a href="/manager/author_list/" class="sidebar-link">
+                            <i class="fas fa-users"></i> 作者管理
+                        </a>
+                        <hr>
+                        <a href="/manager/logout/" class="sidebar-link text-danger">
+                            <i class="fas fa-sign-out-alt"></i> 退出系统
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-md-9">
+                    <!-- Current Info Display -->
+                    <div class="info-card">
+                        <h6 class="text-muted mb-3"><i class="fas fa-info-circle"></i> 当前信息</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>出版社ID:</strong> {{ publisher_obj.id }}</p>
+                                <p class="mb-1"><strong>当前名称:</strong> {{ publisher_obj.publisher_name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>当前地址:</strong> {{ publisher_obj.publisher_address }}</p>
+                                <p class="mb-1"><strong>出版图书:</strong> {{ publisher_obj.book_set.count }} 本</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-card">
+                        <form action="/manager/edit_publisher/" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ publisher_obj.id }}">
+                            
+                            <h5 class="mb-4 text-primary"><i class="fas fa-edit"></i> 修改出版社信息</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label">出版社名称 <span class="required">*</span></label>
+                                        <input type="text" name="publisher_name" class="form-control" 
+                                               value="{{ publisher_obj.publisher_name }}" required>
+                                        <small class="text-muted">请输入完整的出版社名称</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label">出版社地址 <span class="required">*</span></label>
+                                        <input type="text" name="publisher_address" class="form-control" 
+                                               value="{{ publisher_obj.publisher_address }}" required>
+                                        <small class="text-muted">请输入详细的地址信息</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
+                                <a href="/manager/publisher_list/" class="btn btn-secondary-modern">
+                                    <i class="fas fa-times"></i> 取消
+                                </a>
+                                <button type="submit" class="btn btn-primary-modern">
+                                    <i class="fas fa-save"></i> 保存修改
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Display current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-CN');
+    </script>
+</body>
+</html>
+
+

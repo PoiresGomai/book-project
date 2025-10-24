@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作者管理 - 图书管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .header-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: none;
+        }
+        
+        .table-modern {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .table-modern thead th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .table-modern tbody td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+        
+        .table-modern tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-edit {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .book-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--info-color), #0891b2);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin: 2px;
+            font-weight: 500;
+        }
+        
+        .book-count-badge {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .toolbar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .btn-modern {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .btn-success-modern {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            color: white;
+        }
+        
+        .btn-success-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+            color: white;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #374151;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <!-- Header -->
+        <div class="header-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-1"><i class="fas fa-users"></i> 作者管理</h1>
+                    <p class="mb-0 opacity-75">管理系统中的所有作者信息</p>
+                </div>
+                <div>
+                    <a href="/manager/dashboard/" class="btn btn-light me-2">
+                        <i class="fas fa-home"></i> 仪表板
+                    </a>
+                    <a href="/manager/logout/" class="btn btn-outline-light">
+                        <i class="fas fa-sign-out-alt"></i> 退出
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ ret_list|length }}</div>
+                    <div class="stat-label">总作者数</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-value" id="total-books">0</div>
+                    <div class="stat-label">关联图书</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value" id="avg-books">0</div>
+                    <div class="stat-label">平均著作数</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, var(--info-color), #0891b2);">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value" id="max-books">0</div>
+                    <div class="stat-label">最多著作</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="搜索作者姓名或图书...">
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="/manager/add_author/" class="btn btn-success-modern">
+                        <i class="fas fa-plus"></i> 添加新作者
+                    </a>
+                    <a href="/manager/book_list/" class="btn btn-primary-modern ms-2">
+                        <i class="fas fa-book"></i> 图书管理
+                    </a>
+                    <a href="/manager/publisher_list/" class="btn btn-primary-modern ms-2">
+                        <i class="fas fa-building"></i> 出版社管理
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authors Table -->
+        <div class="content-card">
+            <h4 class="mb-4">
+                <i class="fas fa-list"></i> 作者列表
+                <span class="badge bg-primary ms-2">{{ ret_list|length }}</span>
+            </h4>
+
+            {% if ret_list %}
+            <div class="table-responsive">
+                <table class="table table-modern">
+                    <thead>
+                        <tr>
+                            <th width="8%">序号</th>
+                            <th width="12%">作者ID</th>
+                            <th width="18%">作者姓名</th>
+                            <th width="42%">相关图书</th>
+                            <th width="10%">著作数量</th>
+                            <th width="10%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res_dic in ret_list %}
+                        <tr class="author-row">
+                            <td>
+                                <span class="badge bg-secondary">{{ forloop.counter }}</span>
+                            </td>
+                            <td>
+                                <strong style="color: var(--primary-color);">#{{ res_dic.author_obj.id }}</strong>
+                            </td>
+                            <td>
+                                <strong>{{ res_dic.author_obj.name }}</strong>
+                            </td>
+                            <td>
+                                <div style="max-width: 500px;">
+                                    {% for book_obj in res_dic.book_list %}
+                                        <span class="book-tag" title="{{ book_obj.name }}">
+                                            {{ book_obj.name|truncatechars:25 }}
+                                        </span>
+                                    {% empty %}
+                                        <em class="text-muted">暂无关联图书</em>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="book-count-badge book-count">{{ res_dic.book_list|length }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-action btn-edit btn-sm" 
+                                            onclick="editAuthor({{ res_dic.author_obj.id }})"
+                                            title="编辑作者">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-action btn-delete btn-sm" 
+                                            onclick="deleteAuthor({{ res_dic.author_obj.id }}, '{{ res_dic.author_obj.name }}')"
+                                            title="删除作者">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                <h5>暂无作者数据</h5>
+                <p class="text-muted">系统中还没有添加任何作者信息</p>
+                <a href="/manager/add_author/" class="btn btn-success-modern mt-3">
+                    <i class="fas fa-plus"></i> 添加第一个作者
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Calculate statistics
+        document.addEventListener('DOMContentLoaded', function() {
+            const authorRows = document.querySelectorAll('.author-row');
+            let totalBooks = 0;
+            let maxBooks = 0;
+
+            authorRows.forEach(row => {
+                const bookCount = parseInt(row.querySelector('.book-count').textContent);
+                totalBooks += bookCount;
+                if (bookCount > maxBooks) {
+                    maxBooks = bookCount;
+                }
+            });
+
+            const avgBooks = authorRows.length > 0 ? (totalBooks / authorRows.length).toFixed(1) : 0;
+
+            document.getElementById('total-books').textContent = totalBooks;
+            document.getElementById('avg-books').textContent = avgBooks;
+            document.getElementById('max-books').textContent = maxBooks;
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.author-row');
+
+            rows.forEach(row => {
+                const authorName = row.cells[2].textContent.toLowerCase();
+                const bookTags = row.cells[3].textContent.toLowerCase();
+                
+                if (authorName.includes(searchTerm) || bookTags.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Edit author
+        function editAuthor(authorId) {
+            window.location.href = `/manager/edit_author/?id=${authorId}`;
+        }
+
+        // Delete author
+        function deleteAuthor(authorId, authorName) {
+            if (confirm(`确定要删除作者 "${authorName}" 吗？\n\n注意：删除作者不会删除相关图书，但会解除作者与图书的关联关系。`)) {
+                window.location.href = `/manager/delete_author/?id=${authorId}`;
+            }
+        }
+    </script>
+</body>
+</html>

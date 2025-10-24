@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加图书 - 图书管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .header-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: none;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-modern {
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary-modern {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary-modern:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .sidebar-link {
+            display: block;
+            padding: 12px 16px;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .required {
+            color: var(--danger-color);
+        }
+        
+        .image-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .image-upload-area:hover {
+            border-color: var(--primary-color);
+            background: #f9fafb;
+        }
+        
+        .image-upload-area.dragover {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #9ca3af;
+            margin-bottom: 15px;
+        }
+        
+        .breadcrumb-modern {
+            background: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb-modern .breadcrumb-item a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-modern .breadcrumb-item.active {
+            color: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="header-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <nav class="breadcrumb-modern">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/manager/book_list/"><i class="fas fa-home"></i> 首页</a></li>
+                                <li class="breadcrumb-item"><a href="/manager/book_list/">图书管理</a></li>
+                                <li class="breadcrumb-item active">添加图书</li>
+                            </ol>
+                        </nav>
+                        <h2 class="mb-0"><i class="fas fa-plus-circle"></i> 添加新图书</h2>
+                        <p class="mb-0 mt-2 opacity-75">为系统添加新的图书信息</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="mb-0">欢迎回来，<strong>{{ name }}</strong> 管理员</p>
+                        <small class="opacity-75">今天是 <span id="currentDate"></span></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3">
+                    <div class="sidebar">
+                        <h6 class="text-muted mb-3 fw-bold">快速导航</h6>
+                        <a href="/manager/book_list/" class="sidebar-link">
+                            <i class="fas fa-list"></i> 图书列表
+                        </a>
+                        <a href="/manager/add_book/" class="sidebar-link">
+                            <i class="fas fa-plus"></i> 添加图书
+                        </a>
+                        <a href="/manager/publisher_list/" class="sidebar-link">
+                            <i class="fas fa-building"></i> 出版社管理
+                        </a>                        <a href="/manager/author_list/" class="sidebar-link">
+                            <i class="fas fa-users"></i> 作者管理
+                        </a>
+                        <a href="/manager/order_list/" class="sidebar-link">
+                            <i class="fas fa-shopping-cart"></i> 订单管理
+                        </a>
+                        <hr>
+                        <a href="/manager/logout/" class="sidebar-link text-danger">
+                            <i class="fas fa-sign-out-alt"></i> 退出系统
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-md-9">
+                    <div class="form-card">
+                        <form action="/manager/add_book/" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <!-- Basic Information -->
+                                <div class="col-md-8">
+                                    <h5 class="mb-4 text-primary"><i class="fas fa-info-circle"></i> 基本信息</h5>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">图书名称 <span class="required">*</span></label>
+                                        <input type="text" name="name" class="form-control" 
+                                               placeholder="请输入图书名称" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">图书描述</label>
+                                        <textarea name="description" class="form-control" rows="4"
+                                                  placeholder="请输入图书的详细描述信息..."></textarea>
+                                        <small class="text-muted">详细的图书描述有助于读者了解图书内容</small>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">价格 (元) <span class="required">*</span></label>
+                                                <input type="number" name="price" class="form-control" 
+                                                       step="0.01" min="0" placeholder="0.00" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">出版社 <span class="required">*</span></label>
+                                                <select name="publisher_id" class="form-select" required>
+                                                    <option value="">请选择出版社</option>
+                                                    {% for publisher_obj in publisher_obj_list %}
+                                                    <option value="{{ publisher_obj.id }}">{{ publisher_obj.publisher_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">库存数量 <span class="required">*</span></label>
+                                                <input type="number" name="inventory" class="form-control" 
+                                                       min="0" placeholder="0" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">销售数量</label>
+                                                <input type="number" name="sale_num" class="form-control" 
+                                                       min="0" placeholder="0" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Image Upload -->
+                                <div class="col-md-4">
+                                    <h5 class="mb-4 text-primary"><i class="fas fa-image"></i> 图书封面</h5>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">上传封面图片</label>
+                                        <div class="image-upload-area" onclick="document.getElementById('cover_image').click()">
+                                            <div class="upload-icon">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                            </div>
+                                            <h6>点击上传图片</h6>
+                                            <p class="text-muted mb-0">支持 JPG, PNG, GIF 格式<br>最大 5MB</p>
+                                            <input type="file" id="cover_image" name="cover_image" 
+                                                   accept="image/*" style="display: none;" onchange="previewImage(this)">
+                                        </div>
+                                        <div id="imagePreview" class="mt-3" style="display: none;">
+                                            <img id="preview" class="img-fluid rounded" style="max-height: 200px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Download Section -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h5 class="mb-4 text-primary"><i class="fas fa-download"></i> 电子书下载</h5>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i> <strong>提示：</strong>您可以上传电子书文件（PDF、EPUB等）或提供外部下载链接（如Google Drive、OneDrive等）
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label"><i class="fas fa-file-upload"></i> 上传电子书文件</label>
+                                        <input type="file" name="book_file" class="form-control" 
+                                               accept=".pdf,.epub,.mobi,.azw,.azw3,.txt,.doc,.docx">
+                                        <small class="text-muted">支持格式: PDF, EPUB, MOBI, AZW, TXT, DOC, DOCX</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label"><i class="fas fa-link"></i> 外部下载链接</label>
+                                        <input type="url" name="download_link" class="form-control" 
+                                               placeholder="https://drive.google.com/...">
+                                        <small class="text-muted">或提供Google Drive、OneDrive等外部链接</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
+                                <a href="/manager/book_list/" class="btn btn-secondary-modern">
+                                    <i class="fas fa-times"></i> 取消
+                                </a>
+                                <button type="submit" class="btn btn-primary-modern">
+                                    <i class="fas fa-save"></i> 保存图书
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Display current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-CN');
+        
+        // Image preview function
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.image-upload-area');
+        const fileInput = document.getElementById('cover_image');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight(e) {
+            uploadArea.classList.add('dragover');
+        }
+        
+        function unhighlight(e) {
+            uploadArea.classList.remove('dragover');
+        }
+        
+        uploadArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            previewImage(fileInput);
+        }
+    </script>
+</body>
+</html>
+
+
